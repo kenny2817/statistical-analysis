@@ -128,19 +128,29 @@ str(air_data)
 # interaction of two term is significant. Interpret your findings.
 # ---------------------------------------------------------------------------------------
 
+# Plots
+densityNewer <- density(air_data$Price[air_data$year_cat == "Newer"], na.rm = TRUE)
+densityOlder <- density(air_data$Price[air_data$year_cat == "Older"], na.rm = TRUE)
+
+plot(densityNewer, col = "red",
+     main = "Price by Year Category",
+     xlab = "Price",
+     xlim = range(c(densityNewer$x, densityOlder$x)),
+     ylim = range(c(densityNewer$y, densityOlder$y)))
+lines(densityOlder, col = "green")
+legend("topright", legend = levels(air_data$year_cat), col = c("red", "green"), lty = 1)
+
 # Two-Way ANOVA and analysis
 aov2_price <- aov(Price ~ Model * year_cat, data = air_data)
 summary(aov2_price)
 
 # Test normality assumption for Two-Way ANOVA
 qqnorm(aov2_price$residuals)
-shapiro.test(residuals(aov2_price))
-
+#shapiro.test(residuals(aov2_price))
 # Observations within each sample must be independent
 dwtest(aov2_price, alternative ="two.sided")
-
 # Kolmogorov-Smirnov Test ???
-ks.test(residuals(aov2_price), "pnorm", mean(residuals(aov2_price)), sd(residuals(aov2_price)))
+#ks.test(residuals(aov2_price), "pnorm", mean(residuals(aov2_price)), sd(residuals(aov2_price)))
 # Populations from which the samples are selected must have equal variances (homogeneity of variance)
 bptest(aov2_price)
 

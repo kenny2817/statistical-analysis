@@ -106,8 +106,23 @@ str(air_data)
 
 ## Analyze the effect of Model and year (“year_cat”) together on the price. Analyze whether the interaction of two term is significant. Interpret your findings.
 
-![qqplot-price-model-year](./qqplot-price-model-year.png)
+```r
+densityNewer <- density(air_data$Price[air_data$year_cat == "Newer"], na.rm = TRUE)
+densityOlder <- density(air_data$Price[air_data$year_cat == "Older"], na.rm = TRUE)
+
+plot(densityNewer, col = "red",
+     main = "Price by Year Category",
+     xlab = "Price",
+     xlim = range(c(densityNewer$x, densityOlder$x)),
+     ylim = range(c(densityNewer$y, densityOlder$y)))
+lines(densityOlder, col = "green")
+legend("topright", legend = levels(air_data$year_cat), col = c("red", "green"), lty = 1)
+```
+
+![plot-by-year-cat](./plot-by-year-cat.png)
 *Figure 05*
+
+This first plot aligns with previous analysis, there are two cheaper plane models and two expensive ones, and now we observe that there are older and newer models also which are a bit more expensive (shifted to the right) in each case.
 
 ```r
 aov2_price <- aov(Price ~ Model * year_cat, data = air_data)
@@ -122,12 +137,19 @@ dwtest(aov2_price, alternative ="two.sided")
 bptest(aov2_price)
 ```
 
+![qqplot-price-model-year](./qqplot-price-model-year.png)
+*Figure 06*
+
 Model and year_cat interaction look to adjust to the assumptions, so an ANOVA test could be the right one. 
 
 ![anova-price-model-year](./anova-price-model-year.png)
-*Figure 06*
+*Figure 07*
 
-According to the output, both Model and year cat do not seem to affect Price.
+According to the output:
+- Model affects the Price
+- year_cat affects the Price
+- both Model and year_cat interaction do not seem to affect Price.
 
+Maybe we could create another category (Economic and Premium) and do more analysis ???
 
 # iii) Do not forget to do multiple comparisons tests! Apply post hoc tests to see where the differences source from. Apply three different post hoc tests and compare their findings.
