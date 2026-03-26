@@ -18,8 +18,8 @@ air_data <- air_data |>
     FC = FuelConsumption.L.h.,
     HM = HourlyMaintenance...,
     Price = Price...
-  )
-air_data$EngineType <- as.factor(air_data$EngineType)
+  ) |>
+  mutate(across(c(Model, NumberofEngines, EngineType, SalesRegion), as.factor))
 
 str(air_data)
 
@@ -102,6 +102,7 @@ legend("topright", legend = levels(air_data$EngineType), col = c("blue", "red"),
 # assumptions and visualize the relationship between these two characteristics.
 # ---------------------------------------------------------------------------------------
 
+cat("\nFuel Consumption by Engine Type:\n")
 # Boxplot is best for comparing a continuous variable across categories
 boxplot(FC ~ EngineType, data = air_data,
         main = "Fuel Consumption by Engine Type",
