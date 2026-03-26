@@ -14,7 +14,7 @@ library(car)
 #### Import data set to R assigning the type of each variable correctly
 
 ```r
-air_data <- read.csv("airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
+air_data <- read.csv("../data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
 
 air_data <- air_data %>%
   rename(

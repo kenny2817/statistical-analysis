@@ -12,7 +12,7 @@ library(car)
 # Import data set into R, assigning the type of each variable correctly.
 # ---------------------------------------------------------------------------------------
 
-air_data <- read.csv("airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
+air_data <- read.csv("../data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
 air_data <- air_data |>
   rename(
     FC = FuelConsumption.L.h.,
@@ -89,7 +89,7 @@ dens_turbo <- density(Turbofan_data$FC, na.rm = TRUE)
 dens_piston <- density(Piston_data$FC, na.rm = TRUE)
 
 plot(dens_turbo, col = "red",
-     main = "Density of Fuel Consumption by Engine Type",
+     main = "Fuel Consumption by Engine Type",
      xlab = "Fuel Consumption",
      xlim = range(c(dens_turbo$x, dens_piston$x)), 
      ylim = range(c(dens_turbo$y, dens_piston$y)))
