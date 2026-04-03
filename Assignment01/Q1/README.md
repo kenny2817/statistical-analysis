@@ -1,17 +1,6 @@
-## Q1 Solutions
+# Q1 Solutions
 
-Import “airplane price data set” into R. The data set consists of following variables: Model, Production Year, Number of Engines, Engine Type, Capacity, Range (km), Fuel Consumption, Hourly Maintenance, age, Sales Region and Price of different airplanes.
-
-#### Libraries
-
-```r
-library(tidyverse)
-library(dplyr)
-library(car)
-```
-
-
-#### Import data set to R assigning the type of each variable correctly
+## Import data set to R assigning the type of each variable correctly
 
 ```r
 air_data <- read.csv("../data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
@@ -28,7 +17,7 @@ str(air_data)
 ```
 
 
-#### Summarize the variables Price, Fuel Consumption first for the all data and then for the groups of Engine Type
+## Summarize the variables Price, Fuel Consumption first for the all data and then for the groups of Engine Type
 
 ```r
 air_data[, c("Price", "FC")] %>%
@@ -48,7 +37,7 @@ hist(air_data$FC)
 | --- | ---------- | ------------ | --------- | --------- | ----------- | -------- | --- |
 |     | 198833650  | 83921914     | 229039179 | 12.07562  | 9.82        | 9.905418 |     |
 
-![summary-all-data](./summary-all-data.png)
+![figure01](./01-summary-all-data.png)
 *Figure 01*
 
 ```r
@@ -69,48 +58,38 @@ air_data %>%
 | Piston     | 279405.0    | 251474.0     | 77369.0     | 30.1      | 29.9        | 11.6    |
 | Turbofan   | 237995200.0 | 108876395.0  | 231292861.0 | 8.52      | 8.53        | 3.75    |
 
-```r
-divided_data = split(air_data, air_data$EngineType)
-Turbofan_data <- divided_data[[1]]
-Piston_data <- divided_data[[2]]
-```
-![summary-by-type.png](./summary-by-type.png)
+
+![figure02](./02-summary-by-type.png)
 *Figure 02*
 
-![summary-by-type2.png](./summary-by-type2.png)
+![figure03](./03-summary-by-type2.png)
 *Figure 03*
 
 
-#### Test whether Fuel Consumption is affected from the Engine Type of the plane. Check the assumptions and visualize the relationship between these two characteristics
-
-```r
-# Boxplot is best for comparing a continuous variable across categories
-boxplot(FC ~ EngineType, data = air_data,
-        main = "Fuel Consumption by Engine Type",
-        xlab = "Engine Type", ylab = "Fuel Consumption",
-        col = "lightgreen")
-```
-![boxplot-by-type.png](./boxplot-by-type.png)
-![ttest-by-engine.png](./ttest-by-engine.png)
-*Figure 04: p-value < 0.05 so we are rejecting Ho*
+## Test whether Fuel Consumption is affected from the Engine Type of the plane. Check the assumptions and visualize the relationship between these two characteristics
 
 
-#### Construct 95% confidence intervals for the mean of two groups and interpret them
+Boxplot is best for comparing a continuous variable across categories
 
-```r
-cat("\n95% CI for Turbofan Fuel Consumption:\n")
-t.test(Turbofan_data$FC)$conf.int
-cat("\n95% CI for Piston Fuel Consumption:\n")
-t.test(Piston_data$FC)$conf.int
-```
+![figure04](./04-boxplot-by-type.png)
+*Figure 04*
+
+![figure05](./05-ttest-by-engine.png)
+*Figure 05*
+
+p-value < 0.05 so we are rejecting Ho
+
+
+## Construct 95% confidence intervals for the mean of two groups and interpret them
 
 **95% CI for Turbofan Fuel Consumption**: (8.443816, 8.588554)
 - *We are 95% confident that the true population mean of fuel consumption for TurboFan falls between (8.443816, 8.588554)*
+
 **95% CI for Piston Fuel Consumption**: (29.61919, 30.62560)
 - *We are 95% confident that the true population mean of fuel consumption for Piston falls between (29.61919, 30.62560)*
 
 
-#### Check the association between Model and Sales Region in the whole sample using proper method and interpret your findings
+## Check the association between Model and Sales Region in the whole sample using proper method and interpret your findings
 
 ```r
 table_model_region <- table(air_data$Model, air_data$SalesRegion)
@@ -120,36 +99,22 @@ print(chisq_result)
 ```
 
 
-#### Filter your data only considering Bombardier CRJ200 and Cessna 172 model airplanes
+## Filter your data only considering Bombardier CRJ200 and Cessna 172 model airplanes
 
-```r
-filtered_air_data <- air_data %>%
-  filter(Model %in% c("Bombardier CRJ200", "Cessna 172")) %>%
-  droplevels()
-  
-filtered_air_data  %>%
-summarize(
-  Mean_Price = mean(Price, na.rm = TRUE),
-  Median_Price = median(Price, na.rm = TRUE),
-  SD_Price = sd(Price, na.rm = TRUE),
-  Mean_Fuel = mean(FC, na.rm = TRUE),
-  Median_Fuel = median(FC, na.rm = TRUE),
-  SD_Fuel = sd(FC, na.rm = TRUE)
-)
-```
+# TODO: image here instead
 
 | Mean_Price | Median_Price | SD_Price  | Mean_Fuel | Median_Fuel | SD_Fuel |
 | ---------- | ------------ | --------- | --------- | ----------- | ------- |
 | 8033685.0  | 9221878.0    | 8374538.0 | 19.24929  | 13.655      | 13.8377 |
 
 
-#### Check the distribution of Price across two categories of Engine type (You can apply transformation if you think it is required)
+## Check the distribution of Price across two categories of Engine type (You can apply transformation if you think it is required)
 
-![boxplot-logprice-by-type.png](./boxplot-logprice-by-type.png)
-*Figure 05*
+![figure07](./07-boxplot-logprice-by-type.png)
+*Figure 07*
 
 
-#### Categorize the variable Price into two categories as “Low” and “High” by cutting from the median and save it as a new variable into your data frame
+## Categorize the variable Price into two categories as “Low” and “High” by cutting from the median and save it as a new variable into your data frame
 
 ```r
 median_price <- median(filtered_air_data$Price, na.rm = TRUE)
@@ -160,7 +125,7 @@ filtered_air_data$Price_Category <- factor(
 ```
 
 
-#### Cross classify model and price categories and interpret the conditional probabilities
+## Cross classify model and price categories and interpret the conditional probabilities
 
 ```r
 # Cross classify model and price categories
@@ -178,7 +143,7 @@ print(prop.table(cross_model_price, margin = 1))
 | Cessna 172        | 0                  | 1              |
 
 
-#### Is there an association between the model of the airplane and its price level. Analyze it by using proper statistical method
+## Is there an association between the model of the airplane and its price level. Analyze it by using proper statistical method
 
 ```r
 # Test association between Model and Price Level using Chi-Square
@@ -188,7 +153,7 @@ print(test_model_price)
 ```
 
 
-#### Cross classify the variables Model and Sales region. Interpret the conditional probabilities and then test whether there is an association between these two characteristics
+## Cross classify the variables Model and Sales region. Interpret the conditional probabilities and then test whether there is an association between these two characteristics
 
 ```r
 cat("\nCross Classification - Model and Sales Region:\n")
@@ -203,4 +168,3 @@ print(prop.table(cross_model_region, margin = 1))
 test_model_region <- chisq.test(cross_model_region)
 print(test_model_region)
 ```
-

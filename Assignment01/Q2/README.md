@@ -1,8 +1,5 @@
 # Q2 Solutions
 
-Import “airplane price data set” into R. The data set consists of following variables: Model, Production Year, Number of Engines, Engine Type, Capacity, Range (km), Fuel Consumption, Hourly Maintenance, age, Sales Region and Price of different airplanes.
-
-
 ## Create a new data frame only including “Airbus A320”, “Airbus A350”, “Boeing 737” and “Boeing 777” models of airplanes. Check the distribution of Price: first for the observations in this sample and then for each model in the data frame. Interpret your findings.
 
 ```r
@@ -22,10 +19,10 @@ air_data$EngineType <- as.factor(air_data$EngineType)
 air_data$Price <- log(air_data$Price)
 ```
 
-![summary-price-all](./summary-price-all.png)
+![figure01](./01-summary-price-all.png)
 *Figure 01*
 
-![summary-price-by-model](./summary-price-by-model.png)
+![figure02](./02-summary-price-by-model.png)
 *Figure 02*
 
  According to the plots, Price looks more normally distributed after applying a log() transformation and also dividing it by model.
@@ -34,30 +31,14 @@ air_data$Price <- log(air_data$Price)
 
 ## Analyze the numerical variables that are affected by the “Model”. Test the assumptions of the statistical method, for the cases that you have found a significant association, by using corresponding tests and plots. Write your conclusions.
 
-```r
-str(air_data)
-
-# Numerical vars only
-num_vars <- names(air_data)[sapply(air_data, is.numeric)]
-par(mfrow = c(3, 3))
-for (var in num_vars) {
-  boxplot(air_data[[var]] ~ air_data$Model,
-          main = paste(var, "by Model"),
-          xlab = "Model", 
-          ylab = var,
-          col = "lightgreen")
-}
-par(mfrow = c(1, 1))
-```
-
-![boxplot-of-numerics](./boxplot-of-numerics.png)
+![figure03](./03-boxplot-of-numerics.png)
 *Figure 03*
 
 Based on the boxplots, variables **Price**, **Capacity**, and **RangeKm** are the ones affected by **Model**. We are selecting those 3 to do further analysis.
 
 #### Assumption analysis
 
-![qqplot-numerical-all](./qqplot-numerical-all.png)
+![figure04](./04-qqplot-numerical-all.png)
 *Figure 04*
 
 According to the QQ-plot, **Price** looks a bit curved with respect to the line meaning it might not be normally distributed.
@@ -66,19 +47,6 @@ This could mean that newer plane prices skew the data ?? or that another factor 
 For the case of **Capacity** and **RangeKm**, the QQ-plot show a horizontal flat line, meaning the data is not normally distributed.
 
 In any case ANOVA is not the right test to apply in these cases and further analysis is required.
-
-```r
-# ANOVA & Assumptions
-aov_price <- aov(Price ~ Model, data = air_data)
-summary(aov_price)
-# Populations from which the samples are selected must be normal
-qqnorm(aov_price$residuals)
-shapiro.test(residuals(aov_price))
-# Observations within each sample must be independent
-dwtest(aov_price, alternative ="two.sided")
-# Populations from which the samples are selected must have equal variances (homogeneity of variance)
-bptest(aov_price)
-```
 
 
 ## Apply a two-way ANOVA including Sales Region to the model. Interpret your findings.
@@ -106,20 +74,7 @@ str(air_data)
 
 ## Analyze the effect of Model and year (“year_cat”) together on the price. Analyze whether the interaction of two term is significant. Interpret your findings.
 
-```r
-densityNewer <- density(air_data$Price[air_data$year_cat == "Newer"], na.rm = TRUE)
-densityOlder <- density(air_data$Price[air_data$year_cat == "Older"], na.rm = TRUE)
-
-plot(densityNewer, col = "red",
-     main = "Price by Year Category",
-     xlab = "Price",
-     xlim = range(c(densityNewer$x, densityOlder$x)),
-     ylim = range(c(densityNewer$y, densityOlder$y)))
-lines(densityOlder, col = "green")
-legend("topright", legend = levels(air_data$year_cat), col = c("red", "green"), lty = 1)
-```
-
-![plot-by-year-cat](./plot-by-year-cat.png)
+![figure05](./05-plot-by-year-cat.png)
 *Figure 05*
 
 This first plot aligns with previous analysis, there are two cheaper plane models and two expensive ones, and now we observe that there are older and newer models also which are a bit more expensive (shifted to the right) in each case.
@@ -137,12 +92,12 @@ dwtest(aov2_price, alternative ="two.sided")
 bptest(aov2_price)
 ```
 
-![qqplot-price-model-year](./qqplot-price-model-year.png)
+![figure06](./06-qqplot-price-model-year.png)
 *Figure 06*
 
 Model and year_cat interaction look to adjust to the assumptions, so an ANOVA test could be the right one. 
 
-![anova-price-model-year](./anova-price-model-year.png)
+![figure07](./07-anova-price-model-year.png)
 *Figure 07*
 
 According to the output:
