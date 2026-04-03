@@ -59,71 +59,51 @@ sort(cor_matrix[, "Price"], decreasing = TRUE)
 
 # Linear Models
 slr.engines <- lm(Price ~ NumberofEngines, data = numeric_air_data)
+summary(slr.engines)
 slr.capacity <- lm(Price ~ Capacity, data = numeric_air_data)
+summary(slr.capacity)
 slr.range <- lm(Price ~ RangeKm, data = numeric_air_data)
+summary(slr.range)
 
 par(mfrow = c(1, 3))
 plot(slr.engines, which = 1, main = "No. Engines")
 plot(slr.capacity, which = 1, main = "Capacity")
 plot(slr.range, which = 1, main = "RangeKm")
 par(mfrow = c(1, 1))
-
-
 # The plots suggest that:
 # - NumberofEngines is showing a nearly linear relationship with Price
 # - In the case of Capacity and RangeKm, the model may need to include a quadratic term
 
-
-#Capacity2 <- (numeric_air_data$Capacity) ^ 2
-#slr.capacity_2 <- lm(Price ~ Capacity + Capacity2, data = numeric_air_data)
-#summary(slr.capacity_2)
-#RangeKm2 <- (numeric_air_data$RangeKm) ^ 2
-#slr.range_2 <- lm(Price ~ RangeKm + RangeKm2, data = numeric_air_data)
-#summary(slr.range_2)
-
-#par(mfrow = c(1, 2))
-#plot(slr.capacity_2, which = 1, main = "Capacity")
-#plot(slr.range_2, which = 1, main = "RangeKm")
-#par(mfrow = c(1, 1))
-
-# Breusch Pagan with quadratic terms
-# TODO: BPTests keep failing after adding a quadratic term :(
-#bptest(slr.capacity_2)
-#bptest(slr.range_2)
-
-# Compare R-squared
-#summary(slr.range_2)$r.squared
-#summary(slr.capacity_2)$r.squared
+slrmodel.a <- slr.engines
 
 
 # Regression Assumptions
 
 # Normality of the Error Term
-qqnorm(residuals(slr.engines))
-# Using Histogram
-hist(residuals(slr.engines))
+qqnorm(residuals(slrmodel.a))
+hist(residuals(slrmodel.a))
 
 # Homogeneity of Variance
-plot(residuals(slr.engines))
+plot(residuals(slrmodel.a))
 # Breusch Pagan
-bptest(slr.engines)
-
+bptest(slrmodel.a)
 # After running BP test, the model show significant heteroscedasticity
 
 # Independence of errors
-dwtest(slr.engines, alternative = "two.sided")
+dwtest(slrmodel.a, alternative = "two.sided")
 
 
-# We select `slr.engines` model, and therefore, NumberofEngines as the best single predictor
-# because it shows a linear high correlation vs Price, and also high R-squared value,
-# meaning it alone explains the highest proportion of the variance in airplane prices
+# We selected NumberofEngines as the best single predictor because it shows a linear high correlation vs Price
+# and also high R-squared value, meaning it alone explains the highest proportion of the variance in airplane prices
 
-summary(slr.engines)
-# Selecting NumberofEngines for now with R2 = 0.7792
+summary(slrmodel.a)
+
+# Selecting NumberofEngines for now with R2 = 0.7792 meaning 78% of the log(Price)
+# change can be explained by the independent variable NumberofEngines
 
 # Intercept ($\beta_0$): Estimated baseline Price of an airplane
-# Slope for RangeKm ($\beta_1$): Estimated change in the dependent variable for every 1-unit increase in the independent variable
-# Quadratic term (): ...
+# Slope for RangeKm ($\beta_1$): Estimated change in the dependent variable 
+# for every 1-unit increase in the independent variable
 
 
 # ------------------------------------------ B ------------------------------------------
@@ -132,34 +112,68 @@ summary(slr.engines)
 # the simple linear regression model that you fit in (a). Which one is a better model? Why? 
 # ---------------------------------------------------------------------------------------
 
-regmodel.b1 <- lm(Price ~ NumberofEngines + Capacity, data = numeric_air_data)
+regmodel.all <- lm(Price ~ ., data = numeric_air_data)
+summary(regmodel.all)
+# The previous lm tell us that predictors NumberofEngines + Capacity + ProductionYear + RangeKm
+# do have high significance when predicting the Price
+
+regmodel.best4 <- lm(Price ~ NumberofEngines + Capacity + ProductionYear + RangeKm, data = numeric_air_data)
+summary(regmodel.best4)
+
+anova(regmodel.all, regmodel.best4)
+# ANOVA confirms that model with all of the predictors is not significantly better
+# than the model with the 4 predictors
+
+price.col <- which(colnames(numeric_air_data) == "Price")
+plot(numeric_air_data[,-price.col])
+cor(numeric_air_data[,-price.col])
+vif(regmodel.best4)
+# Correlation Matrix and VIF tell us that Capacity and RangeKm are highly correlated
+# VIF also tell us that there is a multicollinearity problem within our predictors
+# We choose to drop the predictor with the highest VIF: Capacity
+
+
+regmodel.best3 <- lm(Price ~ NumberofEngines + ProductionYear + RangeKm, data = numeric_air_data)
+summary(regmodel.best3)
+
+vif(regmodel.best3)
+# Now, VIF shows no multicollinearity among the predictors
+
+
+
+regmodel.b1 <- lm(Price ~ NumberofEngines + ProductionYear, data = numeric_air_data)
 summary(regmodel.b1)
 regmodel.b2 <- lm(Price ~ NumberofEngines + RangeKm, data = numeric_air_data)
 summary(regmodel.b2)
 
-# model b1 yields R2 = 0.9815 vs model b2 yields R2 = 0.9699
+anova(regmodel.best3, regmodel.b1)  # Drop RangeKm predictor
+anova(regmodel.best3, regmodel.b2)  # Drop ProductionYear predictor
+# After comparing both models, dropping each extra predictor, we observe that keeping
+# RangeKm predictor leads to higher R2 (prediction power) and a smaller Sum of Square Residuals
+# So, we decided to choose NumberofEngines + RangeKm
+regmodel.b <- regmodel.b2
+summary(regmodel.b)
 
 # Regression Assumptions
 
 # Normality of the Error Term
-qqnorm(residuals(regmodel.b1))
+qqnorm(residuals(regmodel.b))
 # Using Histogram
-hist(residuals(regmodel.b1))
+hist(residuals(regmodel.b))
 
 # Homogeneity of Variance
-plot(residuals(regmodel.b1))
+plot(residuals(regmodel.b))
 # Breusch Pagan
-bptest(regmodel.b1)
+bptest(regmodel.b)
+# After running BP test, the model still shows significant heteroscedasticity
 
 # Independence of errors
-dwtest(regmodel.b1, alternative = "two.sided")
+dwtest(regmodel.b, alternative = "two.sided")
 
 
-# Compare model b with model a
-anova(slr.engines, regmodel.b1)
-summary(regmodel.b1)
-
-# Adding Capacity to the model decreases significantly the Residual Sum of Squares,
+# Compare model a with model b
+anova(slrmodel.a, regmodel.b)
+# Adding RangeKm to the model decreases significantly the Residual Sum of Squares,
 # meaning the model improves by adding this new variable
 
 
@@ -176,40 +190,46 @@ numeric_air_data$ModelCat <- as.factor(
 )
 summary(numeric_air_data)
 
-regmodel.c1 <- lm(Price ~ NumberofEngines + Capacity + ModelCat, data = numeric_air_data)
-summary(regmodel.c1)
-regmodel.c2 <- lm(Price ~ NumberofEngines + RangeKm + ModelCat, data = numeric_air_data)
-summary(regmodel.c2)
+regmodel.c <- lm(Price ~ NumberofEngines + RangeKm + ModelCat, data = numeric_air_data)
+summary(regmodel.c)
 
-# Compare model c to models in b
-anova(regmodel.b1, regmodel.c1)
-anova(regmodel.b2, regmodel.c2)
+# Compare model b to model c
+anova(regmodel.b, regmodel.c)
+# Adding ModelCat to the model slighly decreases the Residual Sum of Squares,
+# meaning the model improves a bit by adding this new variable
 
-bptest(regmodel.c1)
-bptest(regmodel.c2)
+summary(regmodel.c)
+# Selecting NumberofEngines for now with R2 = 0.7792 meaning 78% of the log(Price)
+# change can be explained by the independent variable NumberofEngines
+
+# Intercept ($\beta_0$): Estimated baseline Price of an airplane
+# Slope for RangeKm ($\beta_1$): Estimated change in the dependent variable 
+# for every 1-unit increase in the independent variable
+
+bptest(regmodel.c)
+# After running BP test in this new mode it shows homescedasticy!!!
 
 
 # ------------------------------------------ D ------------------------------------------
 # Test the validity of the final model that you choose.
 # ---------------------------------------------------------------------------------------
 
-# Choosing model c2, lm(Price ~ NumberofEngines + RangeKm + ModelCat)
+# Choosing model c lm(Price ~ NumberofEngines + RangeKm + ModelCat)
+summary(regmodel.c)
 
 
 # Regression Assumptions
 
 # Normality of the Error Term
-qqnorm(residuals(regmodel.c2))
+qqnorm(residuals(regmodel.c))
 # Using Histogram
-hist(residuals(regmodel.c2))
+hist(residuals(regmodel.c))
 
 # Homogeneity of Variance
-plot(residuals(regmodel.c2))
+plot(residuals(regmodel.c))
 # Breusch Pagan
-bptest(regmodel.c2)
+bptest(regmodel.c)
 
 # Independence of errors
-dwtest(regmodel.c2, alternative = "two.sided")
-
-summary(regmodel.c2)
+dwtest(regmodel.c, alternative = "two.sided")
 
