@@ -1,155 +1,170 @@
-# Q2 Solutions
+# Q3 Solutions
 
 Import “airplane price data set” into R. The data set consists of following variables: Model, Production Year, Number of Engines, Engine Type, Capacity, Range (km), Fuel Consumption, Hourly Maintenance, age, Sales Region and Price of different airplanes.
 
 
-## Create a new data frame only including “Airbus A320”, “Airbus A350”, “Boeing 737” and “Boeing 777” models of airplanes. Check the distribution of Price: first for the observations in this sample and then for each model in the data frame. Interpret your findings.
+## Consider the numerical variables in the data set and find the best SIMPLE linear regression model to predict the prices. Test the assumptions and use transformations if it is required. Explain why the model you find is the best simple linear regression model and interpret the model coefficients.
 
-```r
-air_data <- read.csv("../data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
-air_data <- air_data |>
-  filter(Model %in% c("Airbus A320", "Airbus A350", "Boeing 737", "Boeing 777")) |>
-  droplevels()
-air_data <- air_data |>
-  rename(
-    FC = FuelConsumption.L.h.,
-    HM = HourlyMaintenance...,
-    RangeKm = Range.km.,
-    Price = Price...
-  )
-air_data$EngineType <- as.factor(air_data$EngineType)
-# Price is generally right-skewed data; a log() transformation helps to normalize the data
-air_data$Price <- log(air_data$Price)
-```
-
-![summary-price-all](./summary-price-all.png)
+![figure01](./01-price-plots.png)
 *Figure 01*
 
-![summary-price-by-model](./summary-price-by-model.png)
+According to plot analysis, we are selecting variables NumberOfEngines, Capacity, and RangeKm as best candidates for the linear model bc those show the most linear relationship with Price.
+
+The correlation matrix tell us indeed that NumberofEngines, Capacity and RangeKm are the top 3 with the highest correlation to Price.
+
+![figure02](./02-plot-residual-vs-fitted.png)
 *Figure 02*
 
- According to the plots, Price looks more normally distributed after applying a log() transformation and also dividing it by model.
- A320 and B737 are the cheaper plane models of each company while A350 and B777 are the more expensive ones.
+The Residual vs Fitted plots suggest that:
+- NumberofEngines is showing a nearly linear relationship with Price
+- In the case of Capacity and RangeKm, the model may need to include a quadratic term
 
 
-## Analyze the numerical variables that are affected by the “Model”. Test the assumptions of the statistical method, for the cases that you have found a significant association, by using corresponding tests and plots. Write your conclusions.
+#### Regression assumptions analysis
 
-```r
-str(air_data)
-
-# Numerical vars only
-num_vars <- names(air_data)[sapply(air_data, is.numeric)]
-par(mfrow = c(3, 3))
-for (var in num_vars) {
-  boxplot(air_data[[var]] ~ air_data$Model,
-          main = paste(var, "by Model"),
-          xlab = "Model", 
-          ylab = var,
-          col = "lightgreen")
-}
-par(mfrow = c(1, 1))
-```
-
-![boxplot-of-numerics](./boxplot-of-numerics.png)
+![figure03](./03-reg-assumptions.png)
 *Figure 03*
 
-Based on the boxplots, variables **Price**, **Capacity**, and **RangeKm** are the ones affected by **Model**. We are selecting those 3 to do further analysis.
+Normality of the Residuals (Error Term)
+```r
+qqnorm(residuals(slrmodel.a))
+hist(residuals(slrmodel.a))
+```
 
-#### Assumption analysis
+Homoscedasticity (Homogeneity of Variance)
+```r
+plot(residuals(slrmodel.a))
+# Breusch Pagan
+bptest(slrmodel.a)
+```
+After running BP test, the model show significant heteroscedasticity
 
-![qqplot-numerical-all](./qqplot-numerical-all.png)
+Independence of Errors
+```r
+dwtest(slrmodel.a, alternative = "two.sided")
+```
+
+
+#### Model interpretation
+
+![figure04](./04-modela-summary.png)
 *Figure 04*
 
-According to the QQ-plot, **Price** looks a bit curved with respect to the line meaning it might not be normally distributed.
-This could mean that newer plane prices skew the data ?? or that another factor is affecting the data ???
+We have selected NumberofEngines as the best single predictor because it shows a linear high correlation vs Price and also high R-squared value, meaning it alone explains the highest proportion of the variance in airplane prices
 
-For the case of **Capacity** and **RangeKm**, the QQ-plot show a horizontal flat line, meaning the data is not normally distributed.
+Selecting NumberofEngines for now with R2 = 0.7792 meaning 78% of the log(Price) change can be explained by the independent variable NumberofEngines
 
-In any case ANOVA is not the right test to apply in these cases and further analysis is required.
-
-```r
-# ANOVA & Assumptions
-aov_price <- aov(Price ~ Model, data = air_data)
-summary(aov_price)
-# Populations from which the samples are selected must be normal
-qqnorm(aov_price$residuals)
-shapiro.test(residuals(aov_price))
-# Observations within each sample must be independent
-dwtest(aov_price, alternative ="two.sided")
-# Populations from which the samples are selected must have equal variances (homogeneity of variance)
-bptest(aov_price)
-```
+- Intercept ($\beta_0$): Estimated baseline Price of an airplane
+# TODO: express this accordingly to log price
+- Slope for RangeKm ($\beta_1$): Estimated change in the dependent variable for every 1-unit increase in the independent variable
 
 
-## Apply a two-way ANOVA including Sales Region to the model. Interpret your findings.
+## Fit a multivariate linear regression model with the most important two (numerical) variables. Use transformations if it is needed and test all the assumptions. Then compare this model to the simple linear regression model that you fit in (a). Which one is a better model? Why? 
 
 ```r
-aov2_price <- aov(Price ~ Model * SalesRegion, data = air_data)
-summary(aov2_price)
-aov2_capacity <- aov(Capacity ~ Model * SalesRegion, data = air_data)
-summary(aov2_capacity)
-aov2_range <- aov(RangeKm ~ Model * SalesRegion, data = air_data)
-summary(aov2_range)
+regmodel.all <- lm(Price ~ ., data = numeric_air_data)
+summary(regmodel.all)
 ```
 
-**Region** does not seem to influence any of the 3 numeric variables affected by **Model**.
-
-
-## Convert the variable Production Year to a categorical variable with two levels as “Older” and “Newer” and save it as a new variable named “year_cat” in the data frame.
-
-```r
-cutoff = median(air_data$ProductionYear)
-air_data$year_cat <- as.factor(ifelse(air_data$ProductionYear < cutoff, "Older", "Newer"))
-str(air_data)
-```
-
-
-## Analyze the effect of Model and year (“year_cat”) together on the price. Analyze whether the interaction of two term is significant. Interpret your findings.
-
-```r
-densityNewer <- density(air_data$Price[air_data$year_cat == "Newer"], na.rm = TRUE)
-densityOlder <- density(air_data$Price[air_data$year_cat == "Older"], na.rm = TRUE)
-
-plot(densityNewer, col = "red",
-     main = "Price by Year Category",
-     xlab = "Price",
-     xlim = range(c(densityNewer$x, densityOlder$x)),
-     ylim = range(c(densityNewer$y, densityOlder$y)))
-lines(densityOlder, col = "green")
-legend("topright", legend = levels(air_data$year_cat), col = c("red", "green"), lty = 1)
-```
-
-![plot-by-year-cat](./plot-by-year-cat.png)
+![figure05](./05-lm-all-predictors.png)
 *Figure 05*
 
-This first plot aligns with previous analysis, there are two cheaper plane models and two expensive ones, and now we observe that there are older and newer models also which are a bit more expensive (shifted to the right) in each case.
+The previous lm tell us that predictors NumberofEngines + Capacity + ProductionYear + RangeKm do have high significance when predicting the Price
 
 ```r
-aov2_price <- aov(Price ~ Model * year_cat, data = air_data)
-summary(aov2_price)
+regmodel.best4 <- lm(Price ~ NumberofEngines + Capacity + ProductionYear + RangeKm, data = numeric_air_data)
+summary(regmodel.best4)
 
-# Test normality assumption for Two-Way ANOVA
-qqnorm(aov2_price$residuals)
-shapiro.test(residuals(aov2_price))
-# Observations within each sample must be independent
-dwtest(aov2_price, alternative ="two.sided")
-# Populations from which the samples are selected must have equal variances (homogeneity of variance)
-bptest(aov2_price)
+anova(regmodel.all, regmodel.best4)
 ```
 
-![qqplot-price-model-year](./qqplot-price-model-year.png)
+The ANOVA confirms that model with all of the predictors is not significantly better than the model with the 4 predictors
+
+```r
+cor(numeric_air_data[,-price.col])
+vif(regmodel.best4)
+```
+
+![figure06](./06-multicollinear-predictors.png)
 *Figure 06*
 
-Model and year_cat interaction look to adjust to the assumptions, so an ANOVA test could be the right one. 
+The Correlation Matrix and VIF tell us that Capacity and RangeKm are highly correlated. VIF also tell us that there is a multicollinearity problem within our predictors. We choose to drop the predictor with the highest VIF: Capacity
 
-![anova-price-model-year](./anova-price-model-year.png)
+```r
+regmodel.best3 <- lm(Price ~ NumberofEngines + ProductionYear + RangeKm, data = numeric_air_data)
+summary(regmodel.best3)
+vif(regmodel.best3)
+```
+
+Now, VIF shows no multicollinearity among the selected predictors.
+
+```r
+regmodel.b1 <- lm(Price ~ NumberofEngines + ProductionYear, data = numeric_air_data)
+summary(regmodel.b1)
+regmodel.b2 <- lm(Price ~ NumberofEngines + RangeKm, data = numeric_air_data)
+summary(regmodel.b2)
+
+anova(regmodel.best3, regmodel.b1)  # Drop RangeKm predictor
+anova(regmodel.best3, regmodel.b2)  # Drop ProductionYear predictor
+```
+
+After comparing both models, dropping each extra predictor, we observe that keeping RangeKm predictor leads to higher R2 (prediction power) and a smaller Sum of Square Residuals. So, we decided to choose NumberofEngines + RangeKm
+
+
+#### Model A vs Model B comparison
+
+```r
+anova(slrmodel.a, regmodel.b)
+```
+
+![figure07](./07-compare-modela-modelb.png)
 *Figure 07*
 
-According to the output:
-- Model affects the Price
-- year_cat affects the Price
-- both Model and year_cat interaction do not seem to affect Price.
+Adding RangeKm to the model decreases significantly the Residual Sum of Squares, meaning the model improves by adding this new variable
 
-Maybe we could create another category (Economic and Premium) and do more analysis ???
 
-# iii) Do not forget to do multiple comparisons tests! Apply post hoc tests to see where the differences source from. Apply three different post hoc tests and compare their findings.
+#### Regression assumptions analysis
+
+![figure08](./08-modelb-assumptions.png)
+*Figure 08*
+
+This new model shows better assumtions. Although after running BP test, the model still shows significant heteroscedasticity
+
+
+## Encode the variable model into three categories considering whether the plane is “Airbus”, “Boeing” or “Other”. Now add this model factor to the regression model you have chosen in section (b). Interpret the coefficients and overall summary of the model. Compare the model in section (b) with the model that has an additional factor. Which one would you choose? Why?
+
+```r
+regmodel.c <- lm(Price ~ NumberofEngines + RangeKm + ModelCat, data = numeric_air_data)
+summary(regmodel.c)
+
+anova(regmodel.b, regmodel.c)
+```
+
+#### Model B vs Model C comparison
+
+![figure09](./09-compare-modelb-modelc.png)
+*Figure 09*
+
+Adding ModelCat to the model slighly decreases the Residual Sum of Squares, meaning the model improves a bit by adding this new variable
+
+Selecting NumberofEngines for now with R2 = 0.7792 meaning 78% of the log(Price) change can be explained by the independent variable NumberofEngines
+
+- Intercept ($\beta_0$): Estimated baseline Price of an airplane
+- Slope for RangeKm ($\beta_1$): Estimated change in the dependent variable for every 1-unit increase in the independent variable
+
+
+#### Model interpretation
+
+![figure10](./10-modelc-summary.png)
+*Figure 10*
+
+# TODO: interpretation
+
+
+## Test the validity of the final model that you choose.
+
+![figure11](./11-modelc-assumptions.png)
+*Figure 11*
+
+
+After running BP test in this new mode it shows homoscedasticy!!!

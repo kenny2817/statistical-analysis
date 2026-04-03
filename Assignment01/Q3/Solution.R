@@ -78,7 +78,7 @@ slrmodel.a <- slr.engines
 
 
 # Regression Assumptions
-
+par(mfrow = c(1, 3))
 # Normality of the Error Term
 qqnorm(residuals(slrmodel.a))
 hist(residuals(slrmodel.a))
@@ -91,6 +91,7 @@ bptest(slrmodel.a)
 
 # Independence of errors
 dwtest(slrmodel.a, alternative = "two.sided")
+par(mfrow = c(1, 1))
 
 
 # We selected NumberofEngines as the best single predictor because it shows a linear high correlation vs Price
@@ -140,7 +141,6 @@ vif(regmodel.best3)
 # Now, VIF shows no multicollinearity among the predictors
 
 
-
 regmodel.b1 <- lm(Price ~ NumberofEngines + ProductionYear, data = numeric_air_data)
 summary(regmodel.b1)
 regmodel.b2 <- lm(Price ~ NumberofEngines + RangeKm, data = numeric_air_data)
@@ -155,7 +155,7 @@ regmodel.b <- regmodel.b2
 summary(regmodel.b)
 
 # Regression Assumptions
-
+par(mfrow = c(1, 3))
 # Normality of the Error Term
 qqnorm(residuals(regmodel.b))
 # Using Histogram
@@ -169,6 +169,7 @@ bptest(regmodel.b)
 
 # Independence of errors
 dwtest(regmodel.b, alternative = "two.sided")
+par(mfrow = c(1, 1))
 
 
 # Compare model a with model b
