@@ -1,6 +1,7 @@
 library(tidyverse)
 library(car)
 library(lmtest)
+library(agricolae)
 
 # Import “airplane price data set” to R.
 # The data set consists of following variables: Model, Production Year, Number of 
@@ -14,7 +15,7 @@ library(lmtest)
 # in this sample and then for each model in the data frame. Interpret your findings.
 # ---------------------------------------------------------------------------------------
 
-air_data <- read.csv("../data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
+air_data <- read.csv("./data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
 air_data <- air_data |>
   filter(Model %in% c("Airbus A320", "Airbus A350", "Boeing 737", "Boeing 777")) |>
   droplevels()
@@ -67,8 +68,7 @@ for (var in num_vars) {
   boxplot(air_data[[var]] ~ air_data$Model,
           main = paste(var, "by Model"),
           xlab = "Model", 
-          ylab = var,
-          col = "lightgreen")
+          ylab = var)
 }
 par(mfrow = c(1, 1))
 
@@ -76,8 +76,6 @@ par(mfrow = c(1, 1))
 
 # ANOVA and analysis
 aov_price <- aov(Price ~ Model, data = air_data)
-aov_capacity <- aov(Capacity ~ Model, data = air_data)
-aov_range <- aov(RangeKm ~ Model, data = air_data)
 summary(aov_price)
 
 # Assumptions of ANOVA
@@ -105,10 +103,6 @@ bptest(aov_price)
 # Two-Way ANOVA and analysis
 aov2_price <- aov(Price ~ Model * SalesRegion, data = air_data)
 summary(aov2_price)
-aov2_capacity <- aov(Capacity ~ Model * SalesRegion, data = air_data)
-summary(aov2_capacity)
-aov2_range <- aov(RangeKm ~ Model * SalesRegion, data = air_data)
-summary(aov2_range)
 
 # Region does not seem to influence any of the 3 numeric variables affected by Model
 
@@ -144,15 +138,25 @@ legend("topright", legend = levels(air_data$year_cat), col = c("red", "green"), 
 aov2_price <- aov(Price ~ Model * year_cat, data = air_data)
 summary(aov2_price)
 
+# Interaction Plot
+interaction.plot(air_data$Model, air_data$year_cat, air_data$Price, fun=mean,
+                 type="l", legend=TRUE)
+
 # Test normality assumption for Two-Way ANOVA
 qqnorm(aov2_price$residuals)
-#shapiro.test(residuals(aov2_price))
+# shapiro.test(residuals(aov2_price))
 # Observations within each sample must be independent
 dwtest(aov2_price, alternative ="two.sided")
-# Kolmogorov-Smirnov Test ???
-#ks.test(residuals(aov2_price), "pnorm", mean(residuals(aov2_price)), sd(residuals(aov2_price)))
 # Populations from which the samples are selected must have equal variances (homogeneity of variance)
 bptest(aov2_price)
 
 
+# Post-hoc tests
+tukey_result <- TukeyHSD(aov2_price, which="Model")
+print(tukey_result)
+
+bonferroni_result <- pairwise.t.test(air_data$Price, air_data$Model, p.adjust.method = "bonferroni")
+print(bonferroni_result)
+
+LSD_result <- LSD.test(aov2_price, "Model", p.adj = "bonferroni", console = TRUE)
 
