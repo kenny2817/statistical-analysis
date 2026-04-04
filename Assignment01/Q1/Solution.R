@@ -12,7 +12,7 @@ library(car)
 # Import data set into R, assigning the type of each variable correctly.
 # ---------------------------------------------------------------------------------------
 
-air_data <- read.csv("../data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
+air_data <- read.csv("./data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
 air_data <- air_data |>
   rename(
     FC = FuelConsumption.L.h.,
@@ -78,11 +78,7 @@ hist(Turbofan_data$FC,
      main = "Turbofan: Fuel Consumption", 
      xlab = "Fuel Consumption",
      col = "lightgreen")
-par(mfrow = c(1,1)) 
-
-# plot(density(air_data$Price), xlim = range(0, 70), ylim = range(0, 0.1))
-# lines(density(Turbofan_data$Price), col=2)
-# lines(density(Piston_data$Price), col=3)
+par(mfrow = c(1,1))
 
 # Calculate densities first to find the correct x and y limits
 dens_turbo <- density(Turbofan_data$FC, na.rm = TRUE)

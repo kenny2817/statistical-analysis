@@ -220,7 +220,7 @@ summary(regmodel.c)
 
 
 # Regression Assumptions
-
+par(mfrow = c(1, 3))
 # Normality of the Error Term
 qqnorm(residuals(regmodel.c))
 # Using Histogram
@@ -233,4 +233,4 @@ bptest(regmodel.c)
 
 # Independence of errors
 dwtest(regmodel.c, alternative = "two.sided")
-
+par(mfrow = c(1, 1))

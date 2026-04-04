@@ -3,7 +3,7 @@
 ## Import data set to R assigning the type of each variable correctly
 
 ```r
-air_data <- read.csv("../data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
+air_data <- read.csv("./data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
 
 air_data <- air_data %>%
   rename(
@@ -33,6 +33,8 @@ hist(air_data$Price)
 hist(air_data$FC)
 ```
 
+#### Total summary
+
 |     | Mean_Price | Median_Price | SD_Price  | Mean_Fuel | Median_Fuel | SD_Fuel  |     |
 | --- | ---------- | ------------ | --------- | --------- | ----------- | -------- | --- |
 |     | 198833650  | 83921914     | 229039179 | 12.07562  | 9.82        | 9.905418 |     |
@@ -40,18 +42,7 @@ hist(air_data$FC)
 ![figure01](./01-summary-all-data.png)
 *Figure 01*
 
-```r
-air_data %>%
-  group_by(EngineType) %>%
-  summarize(
-    Mean_Price = mean(Price, na.rm = TRUE),
-    Median_Price = median(Price, na.rm = TRUE),
-    SD_Price = sd(Price, na.rm = TRUE),
-    Mean_Fuel = mean(FC, na.rm = TRUE),
-    Median_Fuel = median(FC, na.rm = TRUE),
-    SD_Fuel = sd(FC, na.rm = TRUE)
-  )
-```
+#### Summary by Model
 
 | EngineType | Mean_Price  | Median_Price | SD_Price    | Mean_Fuel | Median_Fuel | SD_Fuel |
 | ---------- | ----------- | ------------ | ----------- | --------- | ----------- | ------- |
@@ -68,8 +59,7 @@ air_data %>%
 
 ## Test whether Fuel Consumption is affected from the Engine Type of the plane. Check the assumptions and visualize the relationship between these two characteristics
 
-
-Boxplot is best for comparing a continuous variable across categories
+#### Boxplot is best for comparing a continuous variable across categories
 
 ![figure04](./04-boxplot-by-type.png)
 *Figure 04*
@@ -77,16 +67,21 @@ Boxplot is best for comparing a continuous variable across categories
 ![figure05](./05-ttest-by-engine.png)
 *Figure 05*
 
-p-value < 0.05 so we are rejecting Ho
+> **Conclusion:**  Since the p-value is < 0.05, we reject the null hypothesis and conclude there is a significant difference in mean fuel consumption between the engine types.
+
+#### Test assumptions
+
+> We checked for normality (Shapiro-Wilk) and homogeneity of variances (Levene's test). Because the sample size is large (N > 5000), the normality test is overly sensitive, but the large sample size allows us to rely on the Central Limit Theorem.
+> Variance was addressed by using the default robust t-test in R (Welch's t-test).
 
 
 ## Construct 95% confidence intervals for the mean of two groups and interpret them
 
 **95% CI for Turbofan Fuel Consumption**: (8.443816, 8.588554)
-- *We are 95% confident that the true population mean of fuel consumption for TurboFan falls between (8.443816, 8.588554)*
+> *We are 95% confident that the true population mean of fuel consumption for TurboFan falls between (8.443816, 8.588554)*
 
 **95% CI for Piston Fuel Consumption**: (29.61919, 30.62560)
-- *We are 95% confident that the true population mean of fuel consumption for Piston falls between (29.61919, 30.62560)*
+> *We are 95% confident that the true population mean of fuel consumption for Piston falls between (29.61919, 30.62560)*
 
 
 ## Check the association between Model and Sales Region in the whole sample using proper method and interpret your findings
@@ -95,8 +90,9 @@ p-value < 0.05 so we are rejecting Ho
 table_model_region <- table(air_data$Model, air_data$SalesRegion)
 chisq_result <- chisq.test(table_model_region)
 print(chisq_result)
-# p-value = 0.7 so no association.
 ```
+
+> **Conclusion:** Since both variables are categorical, a Chi-Square test is used. The p-value is ~0.7 (p > 0.05), meaning we fail to reject the null hypothesis and conclude there is no significant association between airplane model and sales region.
 
 
 ## Filter your data only considering Bombardier CRJ200 and Cessna 172 model airplanes
@@ -112,6 +108,8 @@ print(chisq_result)
 
 ![figure07](./07-boxplot-logprice-by-type.png)
 *Figure 07*
+
+> We applied a log() transformation to Price to correct for positive (right) skewness and better approximate a normal distribution.
 
 
 ## Categorize the variable Price into two categories as “Low” and “High” by cutting from the median and save it as a new variable into your data frame
@@ -139,8 +137,10 @@ print(prop.table(cross_model_price, margin = 1))
 
 | Model             | High Price Prob    | Low Price Prob |
 | ----------------- | ------------------ | -------------- |
-| Bombardier CRJ200 | 279405.00.99707459 | 0.002925402    |
+| Bombardier CRJ200 | 0.99707459         | 0.002925402    |
 | Cessna 172        | 0                  | 1              |
+
+> **Interpretation:** The conditional probabilities show that if the airplane is a Bombardier CRJ200, there is an approximate 99.7% chance its price falls into the "High" category. Conversely, if the airplane is a Cessna 172, there is a 100% probability that its price is categorized as "Low".
 
 
 ## Is there an association between the model of the airplane and its price level. Analyze it by using proper statistical method
@@ -149,8 +149,9 @@ print(prop.table(cross_model_price, margin = 1))
 # Test association between Model and Price Level using Chi-Square
 test_model_price <- chisq.test(cross_model_price)
 print(test_model_price)
-# p-value < 2.2e-16 so there is a significant association between the airplane model and its price level.
 ```
+
+> **Conclusion:** The p-value < 2.2e-16 so there is a significant association between the airplane model and its price level.
 
 
 ## Cross classify the variables Model and Sales region. Interpret the conditional probabilities and then test whether there is an association between these two characteristics
@@ -162,9 +163,12 @@ print(cross_model_region)
 
 cat("\nConditional Probabilities (Row proportions):\n")
 print(prop.table(cross_model_region, margin = 1))
-# Interpretation: Shows the probability of an airplane being sold in a specific region GIVEN its Model.
 
 # Test for association
 test_model_region <- chisq.test(cross_model_region)
 print(test_model_region)
 ```
+
+> **Interpretation of Conditional Probabilities:** The row proportions indicate the likelihood of each model being sold in a specific region. For example, it shows the percentage of Bombardier CRJ200s sold in 'Europe' vs 'North America', mapping the distribution of sales regions given a specific airplane model.
+
+> **Conclusion:** The Chi-Square test yields a p-value of ~0.2895, so we fail to reject the null hypothesis, concluding there is no significant association between the airplane model and its sales region in this filtered subset.
