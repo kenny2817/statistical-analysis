@@ -47,7 +47,7 @@ planes_pc$loadings
 biplot(planes_pc)
 plot(planes_pc)
 
-# We are selecting the first 4 components as they account for the ~97 percent of the 
+# We are selecting the first 3 components as they account for the ~85 percent of the 
 # data variation
 
 
@@ -56,34 +56,41 @@ plot(planes_pc)
 # the assumptions and the validity of the model.
 # ---------------------------------------------------------------------------------------
 
-planes_pc$loadings[, 1:4]
-pca_data <- as.data.frame(planes_pc$scores[, 1:4])
-# Combine original Price with the first 4 components
-final_model_data <- cbind(Price = air_data$Price, pca_data)
+pca_3comps <- as.data.frame(planes_pc$scores[, 1:3])
+# Combine original Price with the first 3 components
+final_model_data <- cbind(Price = air_data$Price, pca_3comps)
+regmodel.pca3 <- lm(Price ~ ., data = final_model_data)
+summary(regmodel.pca3)
 
-regmodel.pca <- lm(Price ~ ., data = final_model_data)
-summary(regmodel.pca)
+# Compare  model with 3 PC vs model with 2 PC
+pca_2comps <- as.data.frame(planes_pc$scores[, 1:2])
+final_model_data <- cbind(Price = air_data$Price, pca_2comps)
+regmodel.pca2 <- lm(Price ~ ., data = final_model_data)
+summary(regmodel.pca2)
+
+anova(regmodel.pca3, regmodel.pca2)
 
 
-# VIF shows no multicollinearity among the predictors
-vif(regmodel.pca)
+# Comparing the models choosing 2 PC vs 3 PC show us that the first two components
+# are enough to predict Price with the same prediction power R2
+regmodel.b <- regmodel.pca2
 
 
 # Regression Assumptions
 par(mfrow = c(1, 3))
 # Normality of the Error Term
-qqnorm(residuals(regmodel.pca))
+qqnorm(residuals(regmodel.b))
 # Using Histogram
-hist(residuals(regmodel.pca))
+hist(residuals(regmodel.b))
 
 # Homogeneity of Variance
-plot(residuals(regmodel.pca))
+plot(residuals(regmodel.b))
 # Breusch Pagan
-bptest(regmodel.pca)
-# BP test in this new mode it shows homescedasticy!!!
+bptest(regmodel.b)
+# BP test in this new model it shows homescedasticy!!!
 
 # Independence of errors
-dwtest(regmodel.pca, alternative = "two.sided")
+dwtest(regmodel.pc, alternative = "two.sided")
 par(mfrow = c(1, 1))
 
 
@@ -94,15 +101,14 @@ par(mfrow = c(1, 1))
 
 numeric_air_data$ModelCat <- as.factor(
   ifelse(grepl("Airbus", air_data$Model, ignore.case = TRUE), "Airbus",
-         ifelse(grepl("Boeing", air_data$Model, ignore.case = TRUE), "Boeing", "Other"))
+  ifelse(grepl("Boeing", air_data$Model, ignore.case = TRUE), "Boeing", "Other"))
 )
 summary(numeric_air_data)
 
-regmodel.c <- lm(Price ~ NumberofEngines + RangeKm + ModelCat, data = numeric_air_data)
-summary(regmodel.c)
+regmodel.q3 <- lm(Price ~ NumberofEngines + RangeKm + ModelCat, data = numeric_air_data)
+summary(regmodel.q3)
 
-# Compare this model to previous model c
-anova(regmodel.pca, regmodel.c)
-# This new model decreases the Residual Sum of Squares, meaning the model improves
-
+# Compare model b vs previous model in Q3
+anova(regmodel.b, regmodel.q3)
+# Model Q3 decreases the Residual Sum of Squares, meaning the model improves
 
