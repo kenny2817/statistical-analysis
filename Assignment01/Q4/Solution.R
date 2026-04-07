@@ -90,7 +90,7 @@ bptest(regmodel.b)
 # BP test in this new model it shows homescedasticy!!!
 
 # Independence of errors
-dwtest(regmodel.pc, alternative = "two.sided")
+dwtest(regmodel.b, alternative = "two.sided")
 par(mfrow = c(1, 1))
 
 

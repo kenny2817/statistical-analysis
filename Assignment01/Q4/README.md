@@ -46,7 +46,7 @@ After doing an ANOVA analysis with a linear model with 3 PC vs 2PC, it confirms 
 
 #### Regression assumptions analysis
 
-![figure06](./06-modelc-assumptions.png)
+![figure06](./06-modelb-assumptions.png)
 *Figure 06*
 
 This new model shows better assumtions. Although now, independence test shows high significance
@@ -54,3 +54,7 @@ This new model shows better assumtions. Although now, independence test shows hi
 
 ## Would you prefer the linear model that you fit in the final step of question 3 or this one? Explain why.
 
+![figure07](./07-modelb-vs-q3.png)
+*Figure 07*
+
+Previous model Q3 decreases the Residual error, so it predicts better the Price; both models have similar prediction power R2
