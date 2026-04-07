@@ -15,6 +15,7 @@ library(agricolae)
 # in this sample and then for each model in the data frame. Interpret your findings.
 # ---------------------------------------------------------------------------------------
 
+set.seed(42)
 air_data <- read.csv("./data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
 air_data <- air_data |>
   filter(Model %in% c("Airbus A320", "Airbus A350", "Boeing 737", "Boeing 777")) |>
@@ -59,8 +60,6 @@ legend("topright", legend = levels(air_data$Model), col = c("red", "blue", "gree
 # corresponding tests and plots. Write your conclusions. 
 # ---------------------------------------------------------------------------------------
 
-str(air_data)
-
 # Numerical vars only
 num_vars <- names(air_data)[sapply(air_data, is.numeric)]
 par(mfrow = c(3, 3))
@@ -74,7 +73,7 @@ par(mfrow = c(1, 1))
 
 # Based on the boxplots, variables **Price**, **Capacity**, and **RangeKm** are the ones affected by Model.
 
-# ANOVA and analysis
+# ANOVA and analysis, only on Price as it is the only one that shows within-group variation
 aov_price <- aov(Price ~ Model, data = air_data)
 summary(aov_price)
 
@@ -82,16 +81,11 @@ summary(aov_price)
 # Populations from which the samples are selected must be normal
 par(mfrow = c(1, 3))
 qqnorm(aov_price$residuals, main = "Price Q-Q Plot")
-qqnorm(aov_capacity$residuals, main = "Capacity Q-Q Plot")
-qqnorm(aov_range$residuals, main = "RangeKm Q-Q Plot")
 par(mfrow = c(1, 1))
-#shapiro.test(residuals(aov_price))
 
 # Observations within each sample must be independent
 dwtest(aov_price, alternative ="two.sided")
 
-# Kolmogorov-Smirnov Test ???
-# ks.test(residuals(aov_price), "pnorm", mean(residuals(aov_price)), sd(residuals(aov_price)))
 # Populations from which the samples are selected must have equal variances (homogeneity of variance)
 bptest(aov_price)
 

@@ -52,8 +52,7 @@ We have selected NumberofEngines as the best single predictor because it shows a
 Selecting NumberofEngines for now with R2 = 0.7792 meaning 78% of the log(Price) change can be explained by the independent variable NumberofEngines
 
 - Intercept ($\beta_0$): Estimated baseline Price of an airplane
-# TODO: express this accordingly to log price
-- Slope for RangeKm ($\beta_1$): Estimated change in the dependent variable for every 1-unit increase in the independent variable
+- Slope for NumeberofEngines ($\beta_1$): For each additional engine, the log(Price) increases by $\beta_1$, meaning Price increases exponentially by $e^{\beta_1}$
 
 
 ## Fit a multivariate linear regression model with the most important two (numerical) variables. Use transformations if it is needed and test all the assumptions. Then compare this model to the simple linear regression model that you fit in (a). Which one is a better model? Why? 
@@ -137,31 +136,32 @@ summary(regmodel.c)
 anova(regmodel.b, regmodel.c)
 ```
 
+![figure10](./10-modelc-summary.png)
+*Figure 10*
+
+#### Interpretation
+
+- Intercept ($\beta_0$): Estimated baseline Price of an airplane
+- Slope for RangeKm ($\beta_1$): For each additional engine, the log(Price) increases by $\beta_1$, meaning Price increases exponentially by $e^{\beta_1}$
+#### TODO: interpret coefficients and model
+- add residual vs fitted
+- put coefficients as CI (not point estimations)
+
+
 #### Model B vs Model C comparison
 
 ![figure09](./09-compare-modelb-modelc.png)
 *Figure 09*
 
-Adding ModelCat to the model slighly decreases the Residual Sum of Squares, meaning the model improves a bit by adding this new variable
+Adding ModelCat to the model slighly decreases the Residual Sum of Squares, meaning the model improves a bit by adding this new variable.
+Selecting NumberofEngines for now with R2 = 0.7792 meaning 78% of the log(Price) change can be explained by the independent variable NumberofEngines.
 
-Selecting NumberofEngines for now with R2 = 0.7792 meaning 78% of the log(Price) change can be explained by the independent variable NumberofEngines
-
-- Intercept ($\beta_0$): Estimated baseline Price of an airplane
-- Slope for RangeKm ($\beta_1$): Estimated change in the dependent variable for every 1-unit increase in the independent variable
-
-
-#### Model interpretation
-
-![figure10](./10-modelc-summary.png)
-*Figure 10*
-
-# TODO: interpretation
+We decided to select model C
 
 
 ## Test the validity of the final model that you choose.
 
 ![figure11](./11-modelc-assumptions.png)
 *Figure 11*
-
 
 After running BP test in this new mode it shows homoscedasticy!!!

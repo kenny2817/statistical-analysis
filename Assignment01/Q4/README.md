@@ -1,5 +1,8 @@
 # Q4 Solutions
 
+# TODO: Missing cross-validation or out-of-sample test. Neither Q3 nor Q4 validates the models on held-out data. Even a simple train/test split or k-fold CV would substantially strengthen the analysis.
+# No outlier analysis. None of the questions check for influential outliers (Cook's distance, leverage).
+
 ## Apply PCA analysis on airplane data and interpret the results of the analysis.
 
 ![figure01](./01-pca.png)
@@ -8,7 +11,7 @@
 ![figure02](./02-plot-pca.png)
 *Figure 02*
 
-The output of the PCA and the plot show that the first four components account for the ~97 percent of the data variation.
+The output of the PCA and the plot show that the first three components account for the ~85 percent of the data variation.
 We decided to choose the **three most important components** for the analysis.
 
 ![figure03](./03-pca-loadings.png)
@@ -50,6 +53,7 @@ After doing an ANOVA analysis with a linear model with 3 PC vs 2PC, it confirms 
 *Figure 06*
 
 This new model shows better assumtions. Although now, independence test shows high significance
+# TODO: The Durbin-Watson test on the PCA model shows significance (autocorrelation), which is noted but not addressed. If data ordering matters (e.g., sorted by some variable), this should be investigated — or mention that DW may not be meaningful if row order is arbitrary.
 
 
 ## Would you prefer the linear model that you fit in the final step of question 3 or this one? Explain why.
@@ -57,4 +61,6 @@ This new model shows better assumtions. Although now, independence test shows hi
 ![figure07](./07-modelb-vs-q3.png)
 *Figure 07*
 
-Previous model Q3 decreases the Residual error, so it predicts better the Price; both models have similar prediction power R2
+Both models have similar prediction power R2. We prefer the Q3 model because it has lower RSS with interpretable predictors, while the PCA model offers better assumption compliance (homoscedasticity).
+
+# TODO: Since the PCA model solves heteroscedasticity, consider using a hybrid approach: PCA-derived features + ModelCat from Q3 ??

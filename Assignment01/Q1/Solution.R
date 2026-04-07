@@ -1,5 +1,4 @@
 library(tidyverse)
-library(dplyr)
 library(car)
 
 # Import “airplane price data set” to R.
@@ -12,6 +11,7 @@ library(car)
 # Import data set into R, assigning the type of each variable correctly.
 # ---------------------------------------------------------------------------------------
 
+set.seed(42)
 air_data <- read.csv("./data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
 air_data <- air_data |>
   rename(
@@ -39,26 +39,22 @@ air_data[, c("Price", "FC")] |>
     SD_Fuel = sd(FC, na.rm = TRUE)
   )
 
-par(mfrow = c(1,2)) # layout 2 charts in 1 row
+par(mfrow = c(1,2))
 hist(air_data$Price, 
      main = "Histogram of Price", 
      xlab = "Price", 
      col = "lightblue")
-# plot(density(air_data$Price), )
 hist(air_data$FC, 
      main = "Histogram of Fuel Consumption", 
      xlab = "Fuel Consumption (L/h)", 
      col = "lightgreen")
-# plot(density(air_data$FC))
 par(mfrow = c(1,1))
 
-
 divided_data = split(air_data, air_data$EngineType)
-Turbofan_data <- divided_data[[1]]
-Piston_data <- divided_data[[2]]
+Turbofan_data <- divided_data[["Turbofan"]]
+Piston_data <- divided_data[["Piston"]]
 
-
-par(mfrow = c(2,2)) # Layout 4 charts in a 2x2 grid
+par(mfrow = c(2,2))
 # Price Histograms
 hist(Piston_data$Price,
      main = "Piston: Price", 
@@ -80,7 +76,6 @@ hist(Turbofan_data$FC,
      col = "lightgreen")
 par(mfrow = c(1,1))
 
-# Calculate densities first to find the correct x and y limits
 dens_turbo <- density(Turbofan_data$FC, na.rm = TRUE)
 dens_piston <- density(Piston_data$FC, na.rm = TRUE)
 
@@ -138,6 +133,7 @@ t.test(Piston_data$FC)$conf.int
 table_model_region <- table(air_data$Model, air_data$SalesRegion)
 chisq_result <- chisq.test(table_model_region)
 print(chisq_result)
+
 # If the p-value is less than 0.05, you reject the null hypothesis and conclude 
 # there is a significant association between the airplane Model and the Sales Region.
 # p-value = 0.7 so no association.
@@ -192,13 +188,16 @@ str(filtered_air_data$Price_Category)
 # Cross classify model and price categories and interpret the conditional probabilities.
 # ---------------------------------------------------------------------------------------
 
-# Cross classify model and price categories
 cross_model_price <- table(filtered_air_data$Model, filtered_air_data$Price_Category)
 
 cat("\nCross Classification Table (Counts):\n")
 print(cross_model_price)
+
 cat("\nConditional Probabilities (Row proportions):\n")
 print(prop.table(cross_model_price, margin = 1))
+
+cat("\nConditional Probabilities (Column proportions):\n")
+print(prop.table(cross_model_price, margin = 2))
 
 # Interpretation: Shows the probability of an airplane having a "High" or "Low" price GIVEN its specific Model.
 
@@ -231,6 +230,9 @@ print(cross_model_region)
 
 cat("\nConditional Probabilities (Row proportions):\n")
 print(prop.table(cross_model_region, margin = 1))
+
+cat("\nConditional Probabilities (Column proportions):\n")
+print(prop.table(cross_model_region, margin = 2))
 
 # Interpretation: Shows the probability of an airplane being sold in a specific 
 # region GIVEN its Model.

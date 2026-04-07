@@ -67,7 +67,9 @@ hist(air_data$FC)
 ![figure05](./05-ttest-by-engine.png)
 *Figure 05*
 
-> **Conclusion:**  Since the p-value is < 0.05, we reject the null hypothesis and conclude there is a significant difference in mean fuel consumption between the engine types.
+#### Conclusion
+
+Since the p-value is < 0.05, we reject the null hypothesis and conclude there is a significant difference in mean fuel consumption between the engine types.
 
 #### Test assumptions
 
@@ -92,7 +94,9 @@ chisq_result <- chisq.test(table_model_region)
 print(chisq_result)
 ```
 
-> **Conclusion:** Since both variables are categorical, a Chi-Square test is used. The p-value is ~0.7 (p > 0.05), meaning we fail to reject the null hypothesis and conclude there is no significant association between airplane model and sales region.
+#### Conclusion
+
+Since both variables are categorical, a Chi-Square test is used. The p-value is ~0.7 (p > 0.05), meaning we fail to reject the null hypothesis and conclude there is no significant association between airplane model and sales region.
 
 
 ## Filter your data only considering Bombardier CRJ200 and Cessna 172 model airplanes
@@ -133,6 +137,8 @@ cat("\nCross Classification Table (Counts):\n")
 print(cross_model_price)
 cat("\nConditional Probabilities (Row proportions):\n")
 print(prop.table(cross_model_price, margin = 1))
+cat("\nConditional Probabilities (Column proportions):\n")
+print(prop.table(cross_model_price, margin = 2))
 ```
 
 | Model             | High Price Prob    | Low Price Prob |
@@ -140,7 +146,9 @@ print(prop.table(cross_model_price, margin = 1))
 | Bombardier CRJ200 | 0.99707459         | 0.002925402    |
 | Cessna 172        | 0                  | 1              |
 
-> **Interpretation:** The conditional probabilities show that if the airplane is a Bombardier CRJ200, there is an approximate 99.7% chance its price falls into the "High" category. Conversely, if the airplane is a Cessna 172, there is a 100% probability that its price is categorized as "Low".
+#### Conclusion
+
+The conditional probabilities show that if the airplane is a Bombardier CRJ200, there is an approximate 99.7% chance its price falls into the "High" category. Conversely, if the airplane is a Cessna 172, there is a 100% probability that its price is categorized as "Low".
 
 
 ## Is there an association between the model of the airplane and its price level. Analyze it by using proper statistical method
@@ -151,7 +159,9 @@ test_model_price <- chisq.test(cross_model_price)
 print(test_model_price)
 ```
 
-> **Conclusion:** The p-value < 2.2e-16 so there is a significant association between the airplane model and its price level.
+#### Conclusion
+
+The p-value < 2.2e-16 so there is a significant association between the airplane model and its price level.
 
 
 ## Cross classify the variables Model and Sales region. Interpret the conditional probabilities and then test whether there is an association between these two characteristics
@@ -169,6 +179,10 @@ test_model_region <- chisq.test(cross_model_region)
 print(test_model_region)
 ```
 
-> **Interpretation of Conditional Probabilities:** The row proportions indicate the likelihood of each model being sold in a specific region. For example, it shows the percentage of Bombardier CRJ200s sold in 'Europe' vs 'North America', mapping the distribution of sales regions given a specific airplane model.
+#### Interpretation of Conditional Probabilities
 
-> **Conclusion:** The Chi-Square test yields a p-value of ~0.2895, so we fail to reject the null hypothesis, concluding there is no significant association between the airplane model and its sales region in this filtered subset.
+The row proportions indicate the likelihood of each model being sold in a specific region. For example, it shows the percentage of Bombardier CRJ200s sold in 'Europe' vs 'North America', mapping the distribution of sales regions given a specific airplane model.
+
+#### Conclusion
+
+The Chi-Square test yields a p-value of ~0.2895, so we fail to reject the null hypothesis, concluding there is no significant association between the airplane model and its sales region in this filtered subset.

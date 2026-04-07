@@ -15,6 +15,7 @@ library(lmtest)
 # Apply PCA analysis on airplane data and interpret the results of the analysis.
 # ---------------------------------------------------------------------------------------
 
+set.seed(42)
 air_data <- read.csv("./data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
 air_data <- air_data |>
   rename(

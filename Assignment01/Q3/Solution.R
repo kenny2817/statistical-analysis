@@ -14,6 +14,7 @@ library(lmtest)
 # Explain why the model you find is the best simple linear regression model and interpret the model coefficients.
 # ---------------------------------------------------------------------------------------
 
+set.seed(42)
 air_data <- read.csv("./data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
 air_data <- air_data |>
   rename(
@@ -202,10 +203,6 @@ anova(regmodel.b, regmodel.c)
 summary(regmodel.c)
 # Selecting NumberofEngines for now with R2 = 0.7792 meaning 78% of the log(Price)
 # change can be explained by the independent variable NumberofEngines
-
-# Intercept ($\beta_0$): Estimated baseline Price of an airplane
-# Slope for RangeKm ($\beta_1$): Estimated change in the dependent variable 
-# for every 1-unit increase in the independent variable
 
 bptest(regmodel.c)
 # After running BP test in this new mode it shows homescedasticy!!!

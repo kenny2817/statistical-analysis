@@ -57,7 +57,7 @@ According to the plots, Price looks more normally distributed after applying a l
 ## Apply a two-way ANOVA including Sales Region to the model. Interpret your findings.
 
 ```r
-aov2_price <- aov(Price ~ Model + SalesRegion, data = air_data)
+aov2_price <- aov(Price ~ Model * SalesRegion, data = air_data)
 summary(aov2_price)
 ```
 
