@@ -27,9 +27,7 @@ air_data$Price <- log(air_data$Price)
 
 #### Conclusion
 
-According to the plots, Price looks more normally distributed after applying a log() transformation and also dividing it by model.
- 
- >A320 and B737 are the cheaper plane models of each company while A350 and B777 are the more expensive ones.
+After the log transformation, Price is approximately normally distributed overall. Per model, Boeing 777 and Airbus A350 have higher mean log(Price) values reflecting their larger capacity and longer range. Boeing 737 and Airbus A320 cluster at lower price levels. Within each model, the log(Price) distribution is roughly symmetric, confirming that log transformation was appropriate for subsequent ANOVA analysis.
 
 
 ## Analyze the numerical variables that are affected by the “Model”. Test the assumptions of the statistical method, for the cases that you have found a significant association, by using corresponding tests and plots. Write your conclusions.
@@ -43,15 +41,19 @@ According to the plots, Price looks more normally distributed after applying a l
 
 - **Price**: The A350 and B777 (expensive sub-group) are in a different wealth bracket compared to the A320 and B737 (cheaper sub-group).
 - **Capacity & RangeKm**: These are affected by the model, though there is almost zero variation within groups in the dataset. This means Model, Capacity, and RangeKm are all telling the model the same thing (high multicollinearity).
+- Lastly, **FC, HM, and Age** are NOT significantly different across models since all four are Turbofan jets and the dataset appears to have similar distributions for these.
 
 #### Assumption analysis
 
 ![figure04](./04-qqplot-numerical-all.png)
 *Figure 04*
 
-- The appearance of a "horizontal flat line" in the QQ-plots for **Capacity** and **RangeKm** occurs because these are likely fixed specifications for a given airplane model. Consequently, there is near-zero variance within each model group.
-
+- The appearance of a "horizontal flat line" in the QQ-plots for **Capacity** and **RangeKm** occurs because these are fixed specifications for a given airplane model. Consequently, there is near-zero variance within each model group.
 - For the case of **Price** the QQ-plot looks a bit curved with respect to the line meaning it might not be normally distributed. However, both Independence test and Homoscedasticity test show a p-vale > 0.05 so we are assuming Normality, Independence and Homoscedasticity.
+
+#### Conclusion
+
+ The ANOVA p-value for Price is < 0.05, so at least one model has a significantly different mean log(Price). The Tukey HSD test shows which specific pairs differ. We expect Boeing 777 and Airbus A350 (wide-body, long-range) to have significantly higher prices than Boeing 737 and Airbus A320 (narrow-body/medium-range). 
 
 
 ## Apply a two-way ANOVA including Sales Region to the model. Interpret your findings.
@@ -66,7 +68,7 @@ summary(aov2_price)
 
 #### Conclusion
 
-There is no significant interaction since the p-value is much higher than 0.05, we can conclude that the relationship between the aircraft Model and its Price does not change based on the Sales Region. Also, while there might be a tiny hint of a regional difference, statistically speaking, Region does not significantly affect Price.
+There is no significant interaction since the p-value is much higher than 0.05, so we can conclude that the relationship between the aircraft Model and its Price does not change based on the Sales Region. Also, while there might be a tiny hint of a regional difference, statistically speaking, Region does not significantly affect Price.
 
 
 ## Convert the variable Production Year to a categorical variable with two levels as “Older” and “Newer” and save it as a new variable named “year_cat” in the data frame.
@@ -97,6 +99,11 @@ summary(aov2_price)
 *Figure 8*
 
 #### Conclusion
+
+The two-way ANOVA with interaction tests three effects:
+- Main effect of Model: Do different models have different mean prices?
+- Main effect of year_cat: Do newer planes have different prices than older ones?
+- Interaction (Model:year_cat): Does the effect of age on price vary by model?
 
 Based on the two-way ANOVA results, both the airplane Model and the categorized production year (`year_cat`) have a significant independent effect on the Price. However, the interaction between the Model and the production year is not statistically significant, indicating that the price difference between newer and older airplanes remains consistent regardless of the specific airplane model.
 
