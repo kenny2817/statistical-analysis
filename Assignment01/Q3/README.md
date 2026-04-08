@@ -22,27 +22,10 @@ The Residual vs Fitted plots suggest that:
 ![figure03](./03-reg-assumptions.png)
 *Figure 03*
 
-Normality of the Residuals (Error Term)
-```r
-qqnorm(residuals(slrmodel.a))
-hist(residuals(slrmodel.a))
-```
-
-Homoscedasticity (Homogeneity of Variance)
-```r
-plot(residuals(slrmodel.a))
-# Breusch Pagan
-bptest(slrmodel.a)
-```
-After running BP test, the model show significant heteroscedasticity
-
-Independence of Errors
-```r
-dwtest(slrmodel.a, alternative = "two.sided")
-```
+> This model shows p-value < 0.05 on the Breusch-Pagan, meaning it has signs of heteroscedasticity!!!
 
 
-#### Model interpretation
+#### Conclusion
 
 ![figure04](./04-modela-summary.png)
 *Figure 04*
@@ -50,7 +33,6 @@ dwtest(slrmodel.a, alternative = "two.sided")
 We have selected NumberofEngines as the best single predictor because it shows a linear high correlation vs Price and also high R-squared value, meaning it alone explains the highest proportion of the variance in airplane prices
 
 Selecting NumberofEngines for now with R2 = 0.7792 meaning 78% of the log(Price) change can be explained by the independent variable NumberofEngines
-
 - Intercept ($\beta_0$): Estimated baseline Price of an airplane
 - Slope for NumeberofEngines ($\beta_1$): For each additional engine, the log(Price) increases by $\beta_1$, meaning Price increases exponentially by $e^{\beta_1}$
 
@@ -109,14 +91,11 @@ After comparing both models, dropping each extra predictor, we observe that keep
 
 #### Model A vs Model B comparison
 
-```r
-anova(slrmodel.a, regmodel.b)
-```
-
 ![figure07](./07-compare-modela-modelb.png)
 *Figure 07*
 
-Adding RangeKm to the model decreases significantly the Residual Sum of Squares, meaning the model improves by adding this new variable
+- The MLR model with NumberOfEngines + RangeKm do have a higher adjusted R-squared and lower AIC than the SLR with NumberOfEngines alone, indicating a better fit. 
+- The ANOVA F-test tells us whether adding the second variable significantly improves the model.
 
 
 #### Regression assumptions analysis
@@ -124,25 +103,20 @@ Adding RangeKm to the model decreases significantly the Residual Sum of Squares,
 ![figure08](./08-modelb-assumptions.png)
 *Figure 08*
 
-This new model shows better assumtions. Although after running BP test, the model still shows significant heteroscedasticity
+> This model also shows p-value < 0.05 on the Breusch-Pagan, meaning it has signs of heteroscedasticity!!!
 
 
 ## Encode the variable model into three categories considering whether the plane is “Airbus”, “Boeing” or “Other”. Now add this model factor to the regression model you have chosen in section (b). Interpret the coefficients and overall summary of the model. Compare the model in section (b) with the model that has an additional factor. Which one would you choose? Why?
 
-```r
-regmodel.c <- lm(Price ~ NumberofEngines + RangeKm + ModelCat, data = numeric_air_data)
-summary(regmodel.c)
+![figure09](./10-modelc-summary.png)
+*Figure 09*
 
-anova(regmodel.b, regmodel.c)
-```
-
-![figure10](./10-modelc-summary.png)
-*Figure 10*
-
-#### Interpretation
+#### Conclusion
 
 - Intercept ($\beta_0$): Estimated baseline Price of an airplane
-- Slope for RangeKm ($\beta_1$): For each additional engine, the log(Price) increases by $\beta_1$, meaning Price increases exponentially by $e^{\beta_1}$
+- Slope for NumeberofEngines ($\beta_1$): For each additional engine, the log(Price) increases by $\beta_1$, meaning Price increases exponentially by $e^{\beta_1}$
+- Slope for RangeKm ($\beta_2$): For each additional RangeKm, the log(Price) increases by $\beta_2$, meaning Price increases exponentially by $e^{\beta_2}$
+
 #### TODO: interpret coefficients and model
 - add residual vs fitted
 - put coefficients as CI (not point estimations)
@@ -150,13 +124,13 @@ anova(regmodel.b, regmodel.c)
 
 #### Model B vs Model C comparison
 
-![figure09](./09-compare-modelb-modelc.png)
-*Figure 09*
+![figure10](./09-compare-modelb-modelc.png)
+*Figure 10*
 
-Adding ModelCat to the model slighly decreases the Residual Sum of Squares, meaning the model improves a bit by adding this new variable.
-Selecting NumberofEngines for now with R2 = 0.7792 meaning 78% of the log(Price) change can be explained by the independent variable NumberofEngines.
+- The ANOVA analysis, tell us that adding ModelCat to the model decreases the Residual Sum of Squares, meaning the model improves with this new variable.
+- Also, this new model passes the Breusch-Pagan tests meaning it shows homoscedasticity, which make it good for linear regression.
 
-We decided to select model C
+We decided to select model C as out best model.
 
 
 ## Test the validity of the final model that you choose.
@@ -164,4 +138,8 @@ We decided to select model C
 ![figure11](./11-modelc-assumptions.png)
 *Figure 11*
 
-After running BP test in this new mode it shows homoscedasticy!!!
+#### Our final model C:
+- Q-Q plot follows the diagonal (normality holds).
+- Breusch-Pagan p > 0.05 (constant variance / homoscedasticity holds).
+- Durbin-Watson statistic is close to 2 (no autocorrelation).
+- All VIF values < 5 (no severe multicollinearity).

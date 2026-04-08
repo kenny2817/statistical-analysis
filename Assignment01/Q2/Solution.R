@@ -197,8 +197,8 @@ LSD_result <- LSD.test(aov2_price, "Model", p.adj = "bonferroni", console = TRUE
 #   1. Main effect of Model: Do different models have different mean prices?
 #   2. Main effect of year_cat: Do newer planes have different prices than older ones?
 #   3. Interaction (Model:year_cat): Does the effect of age on price vary by model?
-# If the interaction term is significant (p < 0.05), the price difference between
-# newer and older planes is not the same across all models (e.g., newer wide-body
-# planes may appreciate more than newer narrow-body planes).
-# If the interaction is NOT significant, the age effect on price is consistent across
-# all four models, and we interpret only the main effects.
+# Based on the two-way ANOVA results, both the airplane Model and the categorized 
+# production year (`year_cat`) have a significant independent effect on the Price. 
+# However, the interaction between the Model and the production year is not statistically 
+# significant, indicating that the price difference between newer and older airplanes 
+# remains consistent regardless of the specific airplane model.
