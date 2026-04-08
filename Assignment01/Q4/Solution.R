@@ -2,13 +2,18 @@ library(tidyverse)
 library(car)
 library(lmtest)
 
-# Import “airplane price data set” to R.
+# Import "airplane price data set" to R.
 # The data set consists of following variables: Model, Production Year, Number of 
 # Engines, Engine Type, Capacity, Range (km), Fuel Consumption, Hourly Maintenance, 
 # age, Sales Region and Price of different airplanes.
 
 # We aim to reduce dimension, obtain new independent variables to predict price of airplanes by using
 # linear regression.
+
+
+# TODO: Missing cross-validation or out-of-sample test. Neither Q3 nor Q4 validates the models on held-out data. 
+# Even a simple train/test split or k-fold CV would substantially strengthen the analysis.
+# No outlier analysis. None of the questions check for influential outliers (Cook's distance, leverage).
 
 
 # ------------------------------------------ A ------------------------------------------
@@ -31,7 +36,7 @@ hist(air_data$Price)
 air_data$Price <- log(air_data$Price)
 hist(air_data$Price)
 
-# Numerical vars only
+# Numerical vars only (exclude Price since it is the response)
 num_vars <- names(air_data)[sapply(air_data, is.numeric)]
 numeric_air_data <- air_data[, num_vars]
 str(numeric_air_data)
@@ -49,7 +54,17 @@ biplot(planes_pc)
 plot(planes_pc)
 
 # We are selecting the first 3 components as they account for the ~85 percent of the 
-# data variation
+# data variation and also have eigenvalues > 1
+
+
+# Interpretation:
+# PCA reduces the dimensionality of the numerical predictors into uncorrelated principal components.
+# - The scree plot and cumulative variance help decide how many PCs to retain (> 80%)
+# - The loadings show how each original variable contributes to each PC.
+#   PC1 captures airplane size (Capacity, RangeKm, NumberofEngines, FC)
+#   PC2 captures age-related variation (ProductionYear, Age).
+#.  PC3 captures mostly Hours of Maintainance
+# - The biplot visualizes observations and variable contributions simultaneously.
 
 
 # ------------------------------------------ B ------------------------------------------
@@ -71,7 +86,6 @@ summary(regmodel.pca2)
 
 anova(regmodel.pca3, regmodel.pca2)
 
-
 # Comparing the models choosing 2 PC vs 3 PC show us that the first two components
 # are enough to predict Price with the same prediction power R2
 regmodel.b <- regmodel.pca2
@@ -81,6 +95,7 @@ regmodel.b <- regmodel.pca2
 par(mfrow = c(1, 3))
 # Normality of the Error Term
 qqnorm(residuals(regmodel.b))
+qqline(residuals(regmodel.b), col = "red")
 # Using Histogram
 hist(residuals(regmodel.b))
 
@@ -88,7 +103,6 @@ hist(residuals(regmodel.b))
 plot(residuals(regmodel.b))
 # Breusch Pagan
 bptest(regmodel.b)
-# BP test in this new model it shows homescedasticy!!!
 
 # Independence of errors
 dwtest(regmodel.b, alternative = "two.sided")
@@ -113,3 +127,4 @@ summary(regmodel.q3)
 anova(regmodel.b, regmodel.q3)
 # Model Q3 decreases the Residual Sum of Squares, meaning the model improves
 
+# Interpretation:
