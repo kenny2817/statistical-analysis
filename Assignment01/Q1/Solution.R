@@ -1,7 +1,7 @@
 library(tidyverse)
 library(car)
 
-# Import “airplane price data set” to R.
+# Import "airplane price data set" to R.
 # The data set consists of following variables: Model, Production Year, Number of 
 # Engines, Engine Type, Capacity, Range (km), Fuel Consumption, Hourly Maintenance, 
 # age, Sales Region and Price of different airplanes.
@@ -29,14 +29,25 @@ str(air_data)
 # for the groups of Engine Type.
 # ---------------------------------------------------------------------------------------
 
-air_data[, c("Price", "FC")] |>
-  summarize(
-    Mean_Price = mean(Price, na.rm = TRUE),
-    Median_Price = median(Price, na.rm = TRUE),
-    SD_Price = sd(Price, na.rm = TRUE),
-    Mean_Fuel = mean(FC, na.rm = TRUE),
-    Median_Fuel = median(FC, na.rm = TRUE),
-    SD_Fuel = sd(FC, na.rm = TRUE)
+# Overall summary
+summary(air_data$Price)
+summary(air_data$FC)
+
+# Summary by Engine Type
+air_data |>
+  group_by(EngineType) |>
+  summarise(
+    Price_Mean = mean(Price),
+    Price_SD = sd(Price),
+    Price_Median = median(Price),
+    Price_Min = min(Price),
+    Price_Max = max(Price),
+    FC_Mean = mean(FC),
+    FC_SD = sd(FC),
+    FC_Median = median(FC),
+    FC_Min = min(FC),
+    FC_Max = max(FC),
+    n = n()
   )
 
 par(mfrow = c(1,2))
@@ -105,6 +116,7 @@ shapiro.test(Piston_data$FC) # Error, data size > 5000
 # Variance test
 leveneTest(FC ~ EngineType, data = air_data)
 
+# Welch's t-test (does not assume equal variances)
 t.test(FC ~ EngineType, data = air_data)
 
 # p-value < 2.2e-16, alternative hypothesis: true difference in means between group 
@@ -118,10 +130,15 @@ t.test(FC ~ EngineType, data = air_data)
 # ---------------------------------------------------------------------------------------
 
 # 95% Confidence Intervals for the mean of each group
-cat("\n95% CI for Turbofan Fuel Consumption:\n")
-t.test(Turbofan_data$FC)$conf.int
-cat("\n95% CI for Piston Fuel Consumption:\n")
 t.test(Piston_data$FC)$conf.int
+t.test(Turbofan_data$FC)$conf.int
+
+# Interpretation:
+# We are 95% confident that the true population mean of FC for Piston engines 
+# lies within that interval (29.61919, 30.62560)
+# Similarly, the 95% CI for Turbofan is (8.443816, 8.588554)
+# The two intervals do NOT overlap, this provides visual evidence that the mean
+# Fuel Consumption differs significantly between the two engine types.
 
 
 # ------------------------------------------ E ------------------------------------------
@@ -134,9 +151,11 @@ table_model_region <- table(air_data$Model, air_data$SalesRegion)
 chisq_result <- chisq.test(table_model_region)
 print(chisq_result)
 
-# If the p-value is less than 0.05, you reject the null hypothesis and conclude 
-# there is a significant association between the airplane Model and the Sales Region.
-# p-value = 0.7 so no association.
+# Interpretation:
+# The p-value > 0.05 (0.73), so we fail to reject H0 and conclude there is no statistically
+# significant association between Model and Sales Region. The airplane models are
+# distributed similarly across sales regions.
+# A mosaic plot could visually confirms whether the proportions of models vary across regions.
 
 
 # ------------------------------------------ F ------------------------------------------
@@ -146,16 +165,9 @@ print(chisq_result)
 filtered_air_data <- air_data |>
   filter(Model %in% c("Bombardier CRJ200", "Cessna 172")) |>
   droplevels()
-  
-filtered_air_data  |>
-summarize(
-  Mean_Price = mean(Price, na.rm = TRUE),
-  Median_Price = median(Price, na.rm = TRUE),
-  SD_Price = sd(Price, na.rm = TRUE),
-  Mean_Fuel = mean(FC, na.rm = TRUE),
-  Median_Fuel = median(FC, na.rm = TRUE),
-  SD_Fuel = sd(FC, na.rm = TRUE)
-)
+
+str(filtered_air_data)
+summary(filtered_air_data)
 
 
 # ------------------------------------------ G ------------------------------------------
@@ -169,9 +181,21 @@ boxplot(log(Price) ~ EngineType, data = filtered_air_data,
         xlab = "Engine Type", ylab = "Log(Price)",
         col = "lightgreen")
 
+# Plot of Price by Engine Type
+dens_turbo <- density(log(Turbofan_data$Price), na.rm = TRUE)
+dens_piston <- density(log(Piston_data$Price), na.rm = TRUE)
+
+plot(dens_turbo, col = "red",
+     main = "Price by Engine Type",
+     xlab = "Log. Price",
+     xlim = range(c(dens_turbo$x, dens_piston$x)), 
+     ylim = range(c(dens_turbo$y, dens_piston$y)))
+lines(dens_piston, col = "blue")
+legend("topright", legend = levels(air_data$EngineType), col = c("blue", "red"), lty = 1)
+
 
 # ------------------------------------------ H ------------------------------------------
-# Categorize the variable Price into two categories as “Low” and “High” by cutting from the
+# Categorize the variable Price into two categories as "Low" and "High" by cutting from the
 # median and save it as a new variable into your data frame.
 # ---------------------------------------------------------------------------------------
 
@@ -189,17 +213,22 @@ str(filtered_air_data$Price_Category)
 # ---------------------------------------------------------------------------------------
 
 cross_model_price <- table(filtered_air_data$Model, filtered_air_data$Price_Category)
-
-cat("\nCross Classification Table (Counts):\n")
 print(cross_model_price)
-
-cat("\nConditional Probabilities (Row proportions):\n")
+# Conditional probabilities: P(PriceCategory | Model) - row proportions
 print(prop.table(cross_model_price, margin = 1))
-
-cat("\nConditional Probabilities (Column proportions):\n")
+# Conditional probabilities: P(Model | PriceCategory) - column proportions
 print(prop.table(cross_model_price, margin = 2))
 
-# Interpretation: Shows the probability of an airplane having a "High" or "Low" price GIVEN its specific Model.
+# Interpretation:
+# Row proportions P(PriceCategory | Model) show, for each model, what proportion of its
+# airplanes fall into "Low" vs "High" price. Since Bombardier CRJ200 (Turbofan) has much
+# higher prices than Cessna 172 (Piston), we expect nearly all Bombardier CRJ200 to be
+# in the "High" category and nearly all Cessna 172 to be in the "Low" category.
+#
+# Column proportions P(Model | PriceCategory) show, for each price category, what
+# proportion belongs to each model. The "Low" category is dominated by Cessna 172 and
+# the "High" category by Bombardier CRJ200, so it confirms a strong association between
+# airplane model and price level.
 
 
 # ------------------------------------------ J ------------------------------------------
@@ -211,12 +240,11 @@ print(prop.table(cross_model_price, margin = 2))
 test_model_price <- chisq.test(cross_model_price)
 print(test_model_price)
 
-# Check the assumption: Expected frequencies should be at least 5 in all cells
-#cat("\nExpected Frequencies:\n")
-#print(test_model_price$expected)
-
-# Interpretation: p-value < 0.05, so there is a significant association between
-# the airplane model and its price level.
+# Interpretation:
+# The p-value < 0.05, so we reject H0 and conclude there is a statistically significant
+# association between airplane model and price level. Given that Bombardier CRJ200
+# (Turbofan) costs millions while Cessna 172 (Piston) costs hundreds of thousands,
+# we expect a very small p-value, confirming a strong association.
 
 
 # ------------------------------------------ K ------------------------------------------
@@ -224,23 +252,28 @@ print(test_model_price)
 # and then test whether there is an association between these two characteristics.
 # ---------------------------------------------------------------------------------------
 
-cat("\nCross Classification - Model and Sales Region:\n")
+# Cross-classification table
 cross_model_region <- table(filtered_air_data$Model, filtered_air_data$SalesRegion)
 print(cross_model_region)
 
-cat("\nConditional Probabilities (Row proportions):\n")
+# Conditional probabilities: P(SalesRegion | Model)
 print(prop.table(cross_model_region, margin = 1))
-
-cat("\nConditional Probabilities (Column proportions):\n")
+# Conditional probabilities: P(Model | SalesRegion)
 print(prop.table(cross_model_region, margin = 2))
 
-# Interpretation: Shows the probability of an airplane being sold in a specific 
-# region GIVEN its Model.
+# Interpretation of conditional probabilities:
+# P(SalesRegion | Model) (row proportions): shows the distribution of sales regions
+# for each model. Both models have similar proportions across regions, so we conclude
+# that the sales region is independent of the model.
+# P(Model | SalesRegion) (column proportions): shows, within each region, what share
+# belongs to each model. Both models appear in roughly equal proportions within
+# every region, so this supports our independence assumption.
 
 # Test for association
 test_model_region <- chisq.test(cross_model_region)
 print(test_model_region)
 print(test_model_region$residuals)
 
-# Interpretation: p-value = 0.2895, no significant association
-# (Note: If you get a warning that expected counts are too low, you might need to use fisher.test(cross_model_region) instead).
+# Interpretation:
+# As expected, p-value > 0.05 (~0.29), so we fail to reject H0 and conclude there is no significant
+# association — the two models are sold in similar proportions across regions.
