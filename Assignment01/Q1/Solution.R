@@ -139,6 +139,7 @@ t.test(FC ~ EngineType, data = air_data)
 # 95% Confidence Intervals for the mean of each group
 t.test(Piston_data$FC)$conf.int
 t.test(Turbofan_data$FC)$conf.int
+t.test(FC ~ EngineType, data = air_data, conf.level = 0.95)$conf.int # Do not contain 0
 
 # Interpretation:
 # We are 95% confident that the true population mean of FC for Piston engines 
@@ -157,6 +158,7 @@ t.test(Turbofan_data$FC)$conf.int
 table_model_region <- table(air_data$Model, air_data$SalesRegion)
 chisq_result <- chisq.test(table_model_region)
 print(chisq_result)
+any(chisq_result$expected < 5) # There is not freq. below 5
 
 # Interpretation:
 # The p-value > 0.05 (0.73), so we fail to reject H0 and conclude there is no statistically
