@@ -134,14 +134,16 @@ summary(aov2_price)
 
 # Assumptions of ANOVA
 # Populations from which the samples are selected must be normal
-qqnorm(aov2_price$residuals, main = "Price Q-Q Plot")
+qqnorm(aov2_price$residuals, main = "Price Q-Q Plot") # Not very normal
+qqline(aov2_price$residuals)
 shapiro.test(residuals(aov2_price))
 
 # Observations within each sample must be independent
-dwtest(aov2_price, alternative ="two.sided")
+dwtest(aov2_price, alternative ="two.sided") # independency
 
 # Populations from which the samples are selected must have equal variances (homogeneity of variance)
 bptest(aov2_price)
+leveneTest(aov2_price) # different Variances
 
 # Residuals vs Fitted plot
 plot(aov2_price, which = 1)
@@ -156,8 +158,9 @@ plot(aov2_price, which = 1)
 # "Newer" and save it as a new variable named "year_cat" in the data frame.
 # ---------------------------------------------------------------------------------------
 
-cutoff = median(air_data$ProductionYear)
-air_data$year_cat <- as.factor(ifelse(air_data$ProductionYear < cutoff, "Older", "Newer"))
+num_PY <- as.numeric(as.character(air_data$ProductionYear))
+cutoff = median(num_PY)
+air_data$year_cat <- as.factor(ifelse(num_PY < cutoff, "Older", "Newer"))
 str(air_data)
 
 
