@@ -24,7 +24,6 @@ The output of the PCA and the plot show that the first three components account 
 
 ```r
 pca_data <- as.data.frame(planes_pc$scores[, 1:3])
-# Combine original Price with the first 3 components
 final_model_data <- cbind(Price = air_data$Price, pca_data)
 regmodel.pca <- lm(Price ~ ., data = final_model_data)
 summary(regmodel.pca)

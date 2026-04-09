@@ -113,7 +113,6 @@ summary(filtered_air_data)
 
 ```r
 median_price <- median(filtered_air_data$Price, na.rm = TRUE)
-# Create the new categorical variable "Price_Category"
 filtered_air_data$Price_Category <- factor(
   ifelse(filtered_air_data$Price > median_price, "High", "Low")
 )
@@ -134,7 +133,6 @@ filtered_air_data$Price_Category <- factor(
 ## Is there an association between the model of the airplane and its price level. Analyze it by using proper statistical method
 
 ```r
-# Test association between Model and Price Level using Chi-Square
 test_model_price <- chisq.test(cross_model_price)
 print(test_model_price)
 ```
