@@ -20,6 +20,8 @@ air_data <- air_data |>
     Price = Price...
   )
 air_data$EngineType <- as.factor(air_data$EngineType)
+air_data$NumberofEngines <- as.factor(air_data$NumberofEngines) # only 2 different amount of engines
+air_data$ProductionYear <- as.factor(air_data$ProductionYear)
 
 str(air_data)
 
@@ -87,6 +89,11 @@ hist(Turbofan_data$FC,
      col = "lightgreen")
 par(mfrow = c(1,1))
 
+# ------------------------------------------ C ------------------------------------------
+# Test whether Fuel Consumption is affected from the Engine Type of the plane. Check the
+# assumptions and visualize the relationship between these two characteristics.
+# ---------------------------------------------------------------------------------------
+
 dens_turbo <- density(Turbofan_data$FC, na.rm = TRUE)
 dens_piston <- density(Piston_data$FC, na.rm = TRUE)
 
@@ -98,12 +105,6 @@ plot(dens_turbo, col = "red",
 lines(dens_piston, col = "blue")
 legend("topright", legend = levels(air_data$EngineType), col = c("blue", "red"), lty = 1)
 
-
-# ------------------------------------------ C ------------------------------------------
-# Test whether Fuel Consumption is affected from the Engine Type of the plane. Check the
-# assumptions and visualize the relationship between these two characteristics.
-# ---------------------------------------------------------------------------------------
-
 # Boxplot is best for comparing a continuous variable across categories
 boxplot(FC ~ EngineType, data = air_data,
         main = "Fuel Consumption by Engine Type",
@@ -113,7 +114,14 @@ boxplot(FC ~ EngineType, data = air_data,
 # Normality test
 shapiro.test(Turbofan_data$FC)
 shapiro.test(Piston_data$FC) # Error, data size > 5000
+
+qqnorm(Piston_data$FC, main = "Q-Q Plot: Piston Fuel") # Don't follow normal distribution
+qqline(Piston_data$FC)
+qqnorm(Turbofan_data$FC, main = "Q-Q Plot: Turbofan Fuel") # Don't follow normal distribution
+qqline(Turbofan_data$FC) 
+
 # Variance test
+var.test(FC ~ EngineType, data = air_data) # No resilient against non normal distributions
 leveneTest(FC ~ EngineType, data = air_data)
 
 # Welch's t-test (does not assume equal variances)
@@ -123,7 +131,6 @@ t.test(FC ~ EngineType, data = air_data)
 # Piston and group Turbofan is not equal to 0
 # 95 percent confidence interval:
 #  21.09784 22.11459
-
 
 # ------------------------------------------ D ------------------------------------------
 # Construct 95% confidence intervals for the mean of two groups and interpret them.
