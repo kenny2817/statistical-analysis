@@ -163,7 +163,6 @@ cutoff = median(num_PY)
 air_data$year_cat <- as.factor(ifelse(num_PY < cutoff, "Older", "Newer"))
 str(air_data)
 
-
 # ------------------------------------------ E ------------------------------------------
 # Analyze the effect of Model and year ("year_cat") together on the price. Analyze whether the
 # interaction of two term is significant. Interpret your findings.
@@ -181,6 +180,42 @@ plot(densityNewer, col = "red",
 lines(densityOlder, col = "green")
 legend("topright", legend = levels(air_data$year_cat), col = c("red", "green"), lty = 1)
 
+
+# Relation and interception analysis
+with(air_data, interaction.plot(x.factor = year_cat, 
+                                  trace.factor = Model, 
+                                  response = Price,
+                                  main = "Interacción: Modelo vs. Categoría de Año",
+                                  xlab = "Year category",
+                                  ylab = "Avg. Price",
+                                  col = c("red", "blue", "green", "orange"),
+                                  lwd = 2))
+
+# Expensive models
+expensive_models <- subset(air_data, Model %in% c("Airbus A350", "Boeing 777"))
+expensive_models <- droplevels(expensive_models)
+with(expensive_models, interaction.plot(x.factor = year_cat, 
+                                        trace.factor = Model, 
+                                        response = Price,
+                                        main = "Interacción: Modelo vs. Categoría de Año",
+                                        xlab = "Year category",
+                                        ylab = "Avg. Price",
+                                        col = c("blue", "orange"),
+                                        lwd = 2))
+
+# Cheap models
+cheap_models <- subset(air_data, Model %in% c("Airbus A320", "Boeing 737"))
+cheap_models <- droplevels(cheap_models)
+with(cheap_models, interaction.plot(x.factor = year_cat, 
+                                    trace.factor = Model, 
+                                    response = Price,
+                                    main = "Interacción: Modelo vs. Categoría de Año",
+                                    xlab = "Year category",
+                                    ylab = "Avg. Price",
+                                    col = c("red", "green"),
+                                    lwd = 2))
+
+
 # Two-Way ANOVA and analysis
 aov2_price <- aov(Price ~ Model * year_cat, data = air_data)
 summary(aov2_price)
@@ -197,6 +232,7 @@ qqline(residuals(aov2_price), col = "red")
 dwtest(aov2_price, alternative ="two.sided")
 # Populations from which the samples are selected must have equal variances (homogeneity of variance)
 bptest(aov2_price)
+leveneTest(aov2_price) # different Variances
 
 # Post-hoc tests
 tukey_result <- TukeyHSD(aov2_price, which="Model")
