@@ -35,11 +35,13 @@ str(air_data)
 ![figure02](./02-summary-by-type.png)
 *Figure 2.2*
 
-![figure03](./03-summary-by-type2.png)
-*Figure 03*
-
 
 ## Test whether Fuel Consumption is affected from the Engine Type of the plane. Check the assumptions and visualize the relationship between these two characteristics
+
+#### Comparing distributions
+
+![figure03](./03-summary-by-type2.png)
+*Figure 03*
 
 #### Boxplot is best for comparing a continuous variable across categories
 
@@ -77,7 +79,7 @@ print(chisq_result)
 
 #### Conclusion
 
-The p-value > 0.05 (~0.73), so we fail to reject H0 and conclude there is no statistically significant association between Model and Sales Region. The airplane models are distributed similarly across sales regions.
+The p-value > 0.05 (~0.73), so we fail to reject the null hypothesis and conclude there is no statistically significant association between Model and Sales Region. The airplane models are distributed similarly across sales regions.
 
 
 ## Filter your data only considering Bombardier CRJ200 and Cessna 172 model airplanes
@@ -139,7 +141,7 @@ print(test_model_price)
 
 #### Conclusion
 
-The p-value < 0.05, so we reject H0 and conclude there is a statistically significant association between airplane model and price level. Given that Bombardier CRJ200 (Turbofan) costs millions while Cessna 172 (Piston) costs hundreds of thousands, we expect a very small p-value, confirming a strong association.
+The p-value < 0.05, so we reject the null hypothesis and conclude there is a statistically significant association between airplane model and price level. Given that Bombardier CRJ200 (Turbofan) costs millions while Cessna 172 (Piston) costs hundreds of thousands, we expect a very small p-value, confirming a strong association.
 
 
 ## Cross classify the variables Model and Sales region. Interpret the conditional probabilities and then test whether there is an association between these two characteristics
@@ -154,4 +156,4 @@ The p-value < 0.05, so we reject H0 and conclude there is a statistically signif
 
 #### Conclusion
 
-As expected, p-value > 0.05 (~0.29), so we fail to reject H0 and conclude there is no significant association — the two models are sold in similar proportions across regions.
+As expected, p-value > 0.05 (~0.29), so we fail to reject the null hypothesis and conclude there is no significant association. The two models are sold in similar proportions across regions.
