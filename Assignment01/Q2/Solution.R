@@ -28,6 +28,8 @@ air_data <- air_data |>
     Price = Price...
   )
 air_data$EngineType <- as.factor(air_data$EngineType)
+air_data$NumberofEngines <- as.factor(air_data$NumberofEngines) # only 2 different amount of engines
+air_data$ProductionYear <- as.factor(air_data$ProductionYear)
 # Price is generally right-skewed data; a log() transformation helps to normalize the data
 air_data$Price <- log(air_data$Price)
 
@@ -69,7 +71,7 @@ legend("topright", legend = levels(air_data$Model), col = c("red", "blue", "gree
 
 # Numerical vars only
 num_vars <- names(air_data)[sapply(air_data, is.numeric)]
-par(mfrow = c(3, 3))
+par(mfrow = c(2, 3))
 for (var in num_vars) {
   boxplot(air_data[[var]] ~ air_data$Model,
           main = paste(var, "by Model"),
@@ -87,21 +89,30 @@ summary(aov_price)
 # Assumptions of ANOVA
 # Populations from which the samples are selected must be normal
 qqnorm(aov_price$residuals, main = "Price Q-Q Plot")
-shapiro.test(residuals(aov_price))
+qqline(aov_price$residuals)
+shapiro.test(residuals(aov_price)) # Too large sample size
 
 # Observations within each sample must be independent
 dwtest(aov_price, alternative ="two.sided")
 
 # Populations from which the samples are selected must have equal variances (homogeneity of variance)
 bptest(aov_price)
+leveneTest(aov_price) # different Variances
 
 # Residuals vs Fitted plot
 plot(aov_price, which = 1)
 
-# Post-hoc: Tukey HSD to identify which models differ
+# Post-hoc: 
+# Tukey HSD to identify which models differ
 tukey_price <- TukeyHSD(aov_price)
 tukey_price
 plot(tukey_price, las = 1)
+
+# Bonferroni
+pairwise.t.test(air_data$Price, air_data$Model, p.adjust.method = "bonferroni") 
+
+# LSD
+LSD <- LSD.test(aov_price, "Model")
 
 # Interpretation:
 # The ANOVA p-value for Price is < 0.05, so at least one model has a significantly
