@@ -2,23 +2,6 @@
 
 ## Create a new data frame only including “Airbus A320”, “Airbus A350”, “Boeing 737” and “Boeing 777” models of airplanes. Check the distribution of Price: first for the observations in this sample and then for each model in the data frame. Interpret your findings.
 
-```r
-air_data <- read.csv("./data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
-air_data <- air_data |>
-  filter(Model %in% c("Airbus A320", "Airbus A350", "Boeing 737", "Boeing 777")) |>
-  droplevels()
-air_data <- air_data |>
-  rename(
-    FC = FuelConsumption.L.h.,
-    HM = HourlyMaintenance...,
-    RangeKm = Range.km.,
-    Price = Price...
-  )
-air_data$EngineType <- as.factor(air_data$EngineType)
-# Price is generally right-skewed data; a log() transformation helps to normalize the data
-air_data$Price <- log(air_data$Price)
-```
-
 ![figure01](./01-summary-price-all.png)
 *Figure 01*
 
@@ -58,11 +41,6 @@ After the log transformation, Price is approximately normally distributed overal
 
 ## Apply a two-way ANOVA including Sales Region to the model. Interpret your findings.
 
-```r
-aov2_price <- aov(Price ~ Model * SalesRegion, data = air_data)
-summary(aov2_price)
-```
-
 ![figure05](./05-anova-price-region.png)
 *Figure 05*
 
@@ -86,11 +64,6 @@ str(air_data)
 *Figure 06*
 
 > This first plot aligns with previous analysis, there are two cheaper plane models and two expensive ones, and now we observe that there are older and newer models also which are a bit more expensive (shifted to the right) in each case.
-
-```r
-aov2_price <- aov(Price ~ Model * year_cat, data = air_data)
-summary(aov2_price)
-```
 
 ![figure07](./07-anova-price-model-year.png)
 *Figure 7*
