@@ -180,42 +180,6 @@ plot(densityNewer, col = "red",
 lines(densityOlder, col = "green")
 legend("topright", legend = levels(air_data$year_cat), col = c("red", "green"), lty = 1)
 
-
-# Relation and interception analysis
-with(air_data, interaction.plot(x.factor = year_cat, 
-                                  trace.factor = Model, 
-                                  response = Price,
-                                  main = "Interacción: Modelo vs. Categoría de Año",
-                                  xlab = "Year category",
-                                  ylab = "Avg. Price",
-                                  col = c("red", "blue", "green", "orange"),
-                                  lwd = 2))
-
-# Expensive models
-expensive_models <- subset(air_data, Model %in% c("Airbus A350", "Boeing 777"))
-expensive_models <- droplevels(expensive_models)
-with(expensive_models, interaction.plot(x.factor = year_cat, 
-                                        trace.factor = Model, 
-                                        response = Price,
-                                        main = "Interacción: Modelo vs. Categoría de Año",
-                                        xlab = "Year category",
-                                        ylab = "Avg. Price",
-                                        col = c("blue", "orange"),
-                                        lwd = 2))
-
-# Cheap models
-cheap_models <- subset(air_data, Model %in% c("Airbus A320", "Boeing 737"))
-cheap_models <- droplevels(cheap_models)
-with(cheap_models, interaction.plot(x.factor = year_cat, 
-                                    trace.factor = Model, 
-                                    response = Price,
-                                    main = "Interacción: Modelo vs. Categoría de Año",
-                                    xlab = "Year category",
-                                    ylab = "Avg. Price",
-                                    col = c("red", "green"),
-                                    lwd = 2))
-
-
 # Two-Way ANOVA and analysis
 aov2_price <- aov(Price ~ Model * year_cat, data = air_data)
 summary(aov2_price)
