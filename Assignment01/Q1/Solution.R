@@ -272,6 +272,10 @@ print(test_model_price)
 cross_model_region <- table(filtered_air_data$Model, filtered_air_data$SalesRegion)
 print(cross_model_region)
 
+jp <- prop.table(cross_model_region)
+margin.table(jp,1) # evenly distributed
+margin.table(jp,2) # evenly distributed
+
 # Conditional probabilities: P(SalesRegion | Model)
 print(prop.table(cross_model_region, margin = 1))
 # Conditional probabilities: P(Model | SalesRegion)
@@ -289,6 +293,13 @@ print(prop.table(cross_model_region, margin = 2))
 test_model_region <- chisq.test(cross_model_region)
 print(test_model_region)
 print(test_model_region$residuals)
+
+# plot
+mosaicplot(cross_model_region, 
+           main = "Mosaic Plot of Engine Type vs Price Class",
+           color = TRUE, 
+           xlab = "Model", 
+           ylab = "Sales Region")
 
 # Interpretation:
 # As expected, p-value > 0.05 (~0.29), so we fail to reject H0 and conclude there is no significant
