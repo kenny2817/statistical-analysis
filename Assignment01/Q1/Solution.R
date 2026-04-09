@@ -225,6 +225,11 @@ str(filtered_air_data$Price_Category)
 
 cross_model_price <- table(filtered_air_data$Model, filtered_air_data$Price_Category)
 print(cross_model_price)
+
+jp <- prop.table(cross_model_price)
+margin.table(jp,1) # even distribution
+margin.table(jp,2) # even distribution
+
 # Conditional probabilities: P(PriceCategory | Model) - row proportions
 print(prop.table(cross_model_price, margin = 1))
 # Conditional probabilities: P(Model | PriceCategory) - column proportions
