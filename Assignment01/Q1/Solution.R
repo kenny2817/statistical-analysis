@@ -178,18 +178,21 @@ filtered_air_data <- air_data |>
 str(filtered_air_data)
 summary(filtered_air_data)
 
+divided_data = split(filtered_air_data, filtered_air_data$EngineType)
+Turbofan_data <- divided_data[["Turbofan"]]
+Piston_data <- divided_data[["Piston"]]
 
 # ------------------------------------------ G ------------------------------------------
 # Check the distribution of Price across two categories of Engine type. (You can apply
 # transformation if you think it is required)
 # ---------------------------------------------------------------------------------------
 
-# Plotting Log-transformed Price to normalize the distribution
-boxplot(log(Price) ~ EngineType, data = filtered_air_data, 
-        main = "Log Transformed Price by Engine Type", 
-        xlab = "Engine Type", ylab = "Log(Price)",
-        col = "lightgreen")
+par(mfrow = c(1,2))
+# Histograms
+hist(log(Turbofan_data$Price))
+hist(log(Piston_data$Price))
 
+par(mfrow = c(1,1))
 # Plot of Price by Engine Type
 dens_turbo <- density(log(Turbofan_data$Price), na.rm = TRUE)
 dens_piston <- density(log(Piston_data$Price), na.rm = TRUE)
@@ -201,7 +204,6 @@ plot(dens_turbo, col = "red",
      ylim = range(c(dens_turbo$y, dens_piston$y)))
 lines(dens_piston, col = "blue")
 legend("topright", legend = levels(air_data$EngineType), col = c("blue", "red"), lty = 1)
-
 
 # ------------------------------------------ H ------------------------------------------
 # Categorize the variable Price into two categories as "Low" and "High" by cutting from the
