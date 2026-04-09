@@ -113,6 +113,7 @@ pairwise.t.test(air_data$Price, air_data$Model, p.adjust.method = "bonferroni")
 
 # LSD
 LSD <- LSD.test(aov_price, "Model")
+print(LSD)
 
 # Interpretation:
 # The ANOVA p-value for Price is < 0.05, so at least one model has a significantly
