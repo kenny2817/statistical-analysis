@@ -12,6 +12,7 @@
 
 After the log transformation, Price is approximately normally distributed overall. Per model, Boeing 777 and Airbus A350 have higher mean log(Price) values reflecting their larger capacity and longer range. Boeing 737 and Airbus A320 cluster at lower price levels. Within each model, the log(Price) distribution is roughly symmetric, confirming that log transformation was appropriate for subsequent ANOVA analysis.
 
+<div style="page-break-after: always;"></div>
 
 ## Analyze the numerical variables that are affected by the “Model”. Test the assumptions of the statistical method, for the cases that you have found a significant association, by using corresponding tests and plots. Write your conclusions.
 

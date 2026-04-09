@@ -35,6 +35,7 @@ str(air_data)
 ![figure02](./02-summary-by-type.png)
 *Figure 2.2*
 
+<div style="page-break-after: always;"></div>
 
 ## Test whether Fuel Consumption is affected from the Engine Type of the plane. Check the assumptions and visualize the relationship between these two characteristics
 
@@ -93,6 +94,7 @@ str(filtered_air_data)
 summary(filtered_air_data)
 ```
 
+<div style="page-break-after: always;"></div>
 
 ## Check the distribution of Price across two categories of Engine type (You can apply transformation if you think it is required)
 
@@ -118,6 +120,7 @@ filtered_air_data$Price_Category <- factor(
 )
 ```
 
+<div style="page-break-after: always;"></div>
 
 ## Cross classify model and price categories and interpret the conditional probabilities
 
@@ -141,6 +144,7 @@ print(test_model_price)
 
 The p-value < 0.05, so we reject the null hypothesis and conclude there is a statistically significant association between airplane model and price level. Given that Bombardier CRJ200 (Turbofan) costs millions while Cessna 172 (Piston) costs hundreds of thousands, we expect a very small p-value, confirming a strong association.
 
+<div style="page-break-after: always;"></div>
 
 ## Cross classify the variables Model and Sales region. Interpret the conditional probabilities and then test whether there is an association between these two characteristics
 
