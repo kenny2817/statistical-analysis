@@ -214,6 +214,11 @@ cat("\nSLR_2 Adj. R-squared:", summary(slrmodel.a_2)$adj.r.squared, "\n")
 cat("MLR Adj. R-squared:", summary(regmodel.b)$adj.r.squared, "\n")
 cat("MLR_2 Adj. R-squared:", summary(regmodel.b_2)$adj.r.squared, "\n")
 
+cat("\nSLR Adj. Residual standard error:", summary(slrmodel.a)$sigma, "\n")
+cat("\nSLR_2 Adj. Residual standard error:", summary(slrmodel.a_2)$sigma, "\n")
+cat("MLR Adj. Residual standard error:", summary(regmodel.b)$sigma, "\n")
+cat("MLR_2 Adj. Residual standard error:", summary(regmodel.b_2)$sigma, "\n")
+
 
 # Interpretation:
 # The MLR model with RangeKm + FC do have a higher adjusted R-squared 
