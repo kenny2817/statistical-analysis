@@ -1,6 +1,9 @@
 library(tidyverse)
 library(car)
 library(lmtest)
+library(FactoMineR)
+library(psych)
+library(HSAUR)
 
 # Import "airplane price data set" to R.
 # The data set consists of following variables: Model, Production Year, Number of 
@@ -30,10 +33,12 @@ air_data <- air_data |>
     Price = Price...
   )
 air_data$EngineType <- as.factor(air_data$EngineType)
+air_data$ProductionYear <- as.factor(air_data$ProductionYear)
+air_data$NumberofEngines <- as.factor(air_data$NumberofEngines)
 
 # Price is generally right-skewed data; a log() transformation helps to normalize the data
 hist(air_data$Price)
-air_data$Price <- log(air_data$Price)
+air_data$Price <- log(air_data$Price) # execute only
 hist(air_data$Price)
 
 # Numerical vars only (exclude Price since it is the response)
@@ -50,11 +55,27 @@ eigs
 plot(eigs, type = "b")
 
 planes_pc$loadings
-biplot(planes_pc)
+biplot(planes_pc, xlabs = rep("", nrow(air_data)))
 plot(planes_pc)
 
 # We are selecting the first 3 components as they account for the ~85 percent of the 
 # data variation and also have eigenvalues > 1
+
+# PCA visualization
+PCA.air <- PCA(numeric_air_data, quanti.sup = 6)
+summary(PCA.air)
+
+### Explained Variation ###
+PCA.air$eig
+plot(PCA.air$eig[,1], type="o", main="Scree Plot")
+
+## Component Loadings ## 
+PCA.air$var$coord
+PCA.air$var$coord[,1:2]
+
+# Scores of PC1 and PC2
+PCA.air$ind$coord[,1:2]
+summary(PCA.air)
 
 
 # Interpretation:
