@@ -24,22 +24,24 @@ air_data <- air_data |>
     Price = Price...
   )
 air_data$EngineType <- as.factor(air_data$EngineType)
+air_data$NumberofEngines <- as.factor(air_data$NumberofEngines)
+air_data$ProductionYear <- as.factor(air_data$ProductionYear)
 
-# Price is generally right-skewed data; a log() transformation helps to normalize the data
+# log() transformation helps to normalize the data
 hist(air_data$Price)
 air_data$Price <- log(air_data$Price)
 hist(air_data$Price)
 
 # Numerical vars only
 num_vars <- names(air_data)[sapply(air_data, is.numeric)]
-par(mfrow = c(3, 3))
+par(mfrow = c(2, 3))
 for (var in num_vars) {
-    plot(air_data[[var]], air_data$Price, 
-         xlab = var, ylab = "Price", 
-         main = paste("Price vs", var),
-         pch = 19)
-    # Add regression line
-    abline(lm(air_data$Price ~ air_data[[var]]), col = "red", lwd = 2)
+  plot(air_data[[var]], air_data$Price, 
+       xlab = var, ylab = "Price", 
+       main = paste("Price vs", var),
+       pch = 19)
+  # Add regression line
+  abline(lm(air_data$Price ~ air_data[[var]]), col = "red", lwd = 2)
 }
 par(mfrow = c(1, 1))
 
@@ -50,26 +52,28 @@ numeric_air_data <- air_data[, num_vars]
 str(numeric_air_data)
 
 # Next, we use the Correlation Matrix to confirm our assumption
-# Correlation with Price variable (Highest to Lowest)
+# Correlation with Price variable
 cor_matrix <- cor(numeric_air_data)
-cor_matrix
-sort(cor_matrix[, "Price"], decreasing = TRUE)
+cor_matrix["Price", colnames(cor_matrix) != "Price" ]
 
-# Correlation Matrix tell us indeed that NumberofEngines, Capacity and RangeKm are the top 3 
+# Correlation Matrix tell us indeed that Capacity, RangeKm and FuelConsumption are the top 3 
 # with the highest correlation
 
 # Linear Models
-slr.engines <- lm(Price ~ NumberofEngines, data = numeric_air_data)
-summary(slr.engines)
 slr.capacity <- lm(Price ~ Capacity, data = numeric_air_data)
 summary(slr.capacity)
 slr.range <- lm(Price ~ RangeKm, data = numeric_air_data)
 summary(slr.range)
+slr.FC <- lm(Price ~ FC, data = numeric_air_data)
+summary(slr.FC)
 
 par(mfrow = c(1, 3))
-plot(slr.engines, which = 1, main = "No. Engines")
+plot(slr.FC, which = 1, main = "Fuel Consumption")
 plot(slr.capacity, which = 1, main = "Capacity")
 plot(slr.range, which = 1, main = "RangeKm")
+scatterplot(Price~FC, regLine=lm, smooth=FALSE, data=numeric_air_data)
+scatterplot(Price~Capacity, regLine=lm, smooth=FALSE, data=numeric_air_data)
+scatterplot(Price~Range.km., regLine=lm, smooth=FALSE, data=numeric_air_data)
 par(mfrow = c(1, 1))
 # The plots suggest that:
 # - NumberofEngines is showing a nearly linear relationship with Price
