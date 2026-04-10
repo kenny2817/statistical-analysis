@@ -77,6 +77,38 @@ PCA.air$var$coord[,1:2]
 PCA.air$ind$coord[,1:2]
 summary(PCA.air)
 
+# Assumptions
+R<-cor(numeric_air_data[, names(numeric_air_data) != "Price"])
+n <- nrow(numeric_air_data[, names(numeric_air_data) != "Price"])
+cortest.bartlett(R, n) # 
+
+###### Kaiser-Meyer-Olkin (KMO) Test ###
+kmo <- function(x)
+{
+  x <- subset(x, complete.cases(x))       # Omit missing values
+  r <- cor(x)                             # Correlation matrix
+  r2 <- r^2                               # Squared correlation coefficients
+  i <- solve(r)                           # Inverse matrix of correlation matrix
+  d <- diag(i)                            # Diagonal elements of inverse matrix
+  p2 <- (-i/sqrt(outer(d, d)))^2          # Squared partial correlation coefficients
+  diag(r2) <- diag(p2) <- 0               # Delete diagonal elements
+  KMO <- sum(r2)/(sum(r2)+sum(p2))
+  MSA <- colSums(r2)/(colSums(r2)+colSums(p2))
+  return(list(KMO=KMO, MSA=MSA))
+}
+
+#KMO index
+kmo(numeric_air_data[, names(numeric_air_data) != "Price"]) # Only Age and FC are above 0.6
+
+# Normality: All variables and their linear combinations should be normally distributed.
+
+# Linearity: The relationships among pairs of variables should be linear.
+
+# Absence of outliers among individuals: Outliers on individuals could have more influence on the factor solution than the other cases.
+
+# Absence of outliers among variables:The variables that are unrelated to other variables in the data set effect the factor results (A variable with a low correlation with other variables and the important factors is an outlier among variables.).
+
+# Factorability: A factorable data set should include several sizeable correlations (the correlations should exceed 0.30)
 
 # Interpretation:
 # PCA reduces the dimensionality of the numerical predictors into uncorrelated principal components.
@@ -136,7 +168,7 @@ par(mfrow = c(1, 1))
 
 numeric_air_data$ModelCat <- as.factor(
   ifelse(grepl("Airbus", air_data$Model, ignore.case = TRUE), "Airbus",
-  ifelse(grepl("Boeing", air_data$Model, ignore.case = TRUE), "Boeing", "Other"))
+         ifelse(grepl("Boeing", air_data$Model, ignore.case = TRUE), "Boeing", "Other"))
 )
 summary(numeric_air_data)
 
