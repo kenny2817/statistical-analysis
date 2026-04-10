@@ -279,42 +279,29 @@ bptest(regmodel.c)
 dwtest(regmodel.c, alternative = "two.sided")
 par(mfrow = c(1, 1))
 
-# Interpretation:
-# 
-
-
 # ------------------------------------------ D ------------------------------------------
 # Test the validity of the final model that you choose.
 # ---------------------------------------------------------------------------------------
 
-# Choosing model c lm(Price ~ NumberofEngines + RangeKm + ModelCat)
-summary(regmodel.c)
+n <- nrow(numeric_air_data)
+train.sample <- sample(1:n, round(0.8*n))
+train.set <- numeric_air_data[train.sample, ] 
+test.set <- numeric_air_data[-train.sample, ]
+train.set$RangeKm_2 <- train.set$RangeKm^2
+test.set$RangeKm_2  <- test.set$RangeKm^2
 
+train.model <- lm(Price ~ RangeKm_2 * ModelCat + RangeKm, data = train.set)
+summary(train.model)
 
-# Regression Assumptions
-par(mfrow = c(1, 3))
-# Normality of the Error Term
-qqnorm(residuals(regmodel.c))
-qqline(residuals(regmodel.c), col = "red")
-# Using Histogram
-hist(residuals(regmodel.c))
+yhat <- predict(train.model, test.set, interval="prediction")
 
-# Homogeneity of Variance
-plot(residuals(regmodel.c))
-# Breusch Pagan
-bptest(regmodel.c)
+y <- test.set$Price
 
-# Multicollinearity (VIF)
-vif(regmodel.c)
+error <- cbind(yhat[,1,drop=FALSE], y, (y-yhat[,1])^2)
+sqr_err <- error[, 3]
+mse <- mean(sqr_err) 
+print(mse)
 
-# Independence of errors
-dwtest(regmodel.c, alternative = "two.sided")
-par(mfrow = c(1, 1))
-
-# Interpretation:
-# The final model is valid if:
-#   - Residuals vs Fitted shows no clear pattern (linearity holds).
-#   - Q-Q plot follows the diagonal (normality holds).
-#   - Breusch-Pagan p > 0.05 (constant variance / homoscedasticity holds).
-#   - Durbin-Watson statistic is close to 2 (no autocorrelation).
-#   - All VIF values < 5 (no severe multicollinearity).
+plot(y, yhat[,1], xlab = "Actual Price", ylab = "Predicted Price", 
+     main = "Predicted vs. Actual")
+abline(a = 0, b = 1, col = "red")
