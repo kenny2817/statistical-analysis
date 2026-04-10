@@ -73,31 +73,32 @@ plot(slr.capacity, which = 1, main = "Capacity")
 plot(slr.range, which = 1, main = "RangeKm")
 scatterplot(Price~FC, regLine=lm, smooth=FALSE, data=numeric_air_data)
 scatterplot(Price~Capacity, regLine=lm, smooth=FALSE, data=numeric_air_data)
-scatterplot(Price~Range.km., regLine=lm, smooth=FALSE, data=numeric_air_data)
+scatterplot(Price~RangeKm, regLine=lm, smooth=FALSE, data=numeric_air_data)
 par(mfrow = c(1, 1))
 # The plots suggest that:
 # - NumberofEngines is showing a nearly linear relationship with Price
 # - In the case of Capacity and RangeKm, the model may need to include a quadratic term
 
 
-# ANOVA confirms NumberofEngines yields lower RSS
-anova(slr.engines, slr.range)
-anova(slr.engines, slr.capacity)
+# ANOVA confirms Capacity yields lower RSS
+anova(slr.capacity, slr.range)
+anova(slr.capacity, slr.FC)
 
-slrmodel.a <- slr.engines
+slrmodel.a <- slr.capacity
 
 
 # Regression Assumptions
-par(mfrow = c(1, 3))
+par(mfrow = c(1, 2))
 # Normality of the Error Term
 qqnorm(residuals(slrmodel.a))
 qqline(residuals(slrmodel.a), col = "red")
 hist(residuals(slrmodel.a))
 
+par(mfrow = c(1, 1))
 # Homogeneity of Variance
 plot(residuals(slrmodel.a))
 # Breusch Pagan
-bptest(slrmodel.a) # p-value < 0.05 shows heteroscedasticity!!!
+bptest(slrmodel.a) # p-value < 0.05
 
 # Independence of errors
 dwtest(slrmodel.a, alternative = "two.sided")
