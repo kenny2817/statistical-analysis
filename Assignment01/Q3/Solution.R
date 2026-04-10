@@ -109,6 +109,12 @@ par(mfrow = c(1, 1))
 
 summary(slrmodel.a)
 
+Capacity_2 <- (numeric_air_data$Capacity)^2
+slr.capacity_2 <- lm(Price ~ Capacity+Capacity_2, data = numeric_air_data)
+summary(slr.capacity_2) # better results
+
+plot(slr.capacity_2, which = 1, main = "Capacity")
+
 # Interpretation:
 # The best simple linear regression uses NumberofEngines as the predictor because it yields
 # the highest R-squared among all numerical variables. This makes sense since larger
@@ -118,7 +124,6 @@ summary(slrmodel.a)
 #   Slope (NumberOfEngines): for each additional unit of NumberOfEngines, log(Price) increases by
 #   this amount. In original scale, a one-unit increase in NumberOfEngines multiplies the
 #   price by exp(slope).
-
 
 # ------------------------------------------ B ------------------------------------------
 # Fit a multivariate linear regression model with the most important two (numerical) variables.
