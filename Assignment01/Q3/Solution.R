@@ -151,26 +151,27 @@ cor(numeric_air_data[,-price.col])
 vif(regmodel.best4)
 # Correlation Matrix and VIF tell us that Capacity and RangeKm are highly correlated
 # VIF also tell us that there is a multicollinearity problem within our predictors
+# We dropped Capacity as it has higher VIF
 
 
-regmodel.best3 <- lm(Price ~ Capacity + FC + Age, data = numeric_air_data)
+regmodel.best3 <- lm(Price ~ RangeKm + FC + Age, data = numeric_air_data)
 summary(regmodel.best3)
 
 vif(regmodel.best3)
 # Now, VIF shows no multicollinearity among the predictors
 
 
-regmodel.b1 <- lm(Price ~ Capacity + FC, data = numeric_air_data)
+regmodel.b1 <- lm(Price ~ RangeKm + FC, data = numeric_air_data)
 summary(regmodel.b1)
-regmodel.b2 <- lm(Price ~ Capacity + Age, data = numeric_air_data)
+regmodel.b2 <- lm(Price ~ RangeKm + Age, data = numeric_air_data)
 summary(regmodel.b2)
 
-anova(regmodel.best3, regmodel.b1)  # Drop RangeKm predictor
-anova(regmodel.best3, regmodel.b2)  # Drop ProductionYear predictor
+anova(regmodel.best3, regmodel.b1)  # Drop Age predictor
+anova(regmodel.best3, regmodel.b2)  # Drop FC predictor
 # After comparing both models, dropping each extra predictor, we observe that keeping
-# RangeKm predictor leads to higher R2 (prediction power) and a smaller Sum of Square Residuals
+# FC predictor leads to higher R2 (prediction power) and a smaller Sum of Square Residuals
 
-# So, we decided to choose Capacity +  FC
+# So, we decided to choose RangeKm +  FC
 regmodel.b <- regmodel.b1
 summary(regmodel.b)
 
@@ -199,9 +200,13 @@ anova(slrmodel.a, regmodel.b)
 # Adding RangeKm to the model decreases significantly the Residual Sum of Squares,
 # meaning the model improves by adding this new variable
 
-regmodel.b_2 <- lm(Price ~ Capacity + FC + Capacity_2, data = numeric_air_data)
+RangeKm_2 <- (numeric_air_data$RangeKm)^2
+regmodel.b_2 <- lm(Price ~ RangeKm_2 + RangeKm + FC, data = numeric_air_data)
 summary(regmodel.b_2)
-anova(regmodel.b, regmodel.b_2)
+
+anova(regmodel.b_2, regmodel.b)
+plot(regmodel.b_2, which = 1, main = "RangeKm 2")
+
 
 # Compare SLR vs MLR using adjusted R-squared, AIC, and ANOVA
 cat("\nSLR Adj. R-squared:", summary(slrmodel.a)$adj.r.squared, "\n")
@@ -209,9 +214,10 @@ cat("\nSLR_2 Adj. R-squared:", summary(slrmodel.a_2)$adj.r.squared, "\n")
 cat("MLR Adj. R-squared:", summary(regmodel.b)$adj.r.squared, "\n")
 cat("MLR_2 Adj. R-squared:", summary(regmodel.b_2)$adj.r.squared, "\n")
 
+
 # Interpretation:
-# The MLR model with NumberOfEngines + RangeKm do have a higher adjusted R-squared and
-# lower AIC than the SLR with NumberOfEngines alone, indicating a better fit.
+# The MLR model with RangeKm + FC do have a higher adjusted R-squared 
+# than the SLR with Capacity alone, indicating a better fit.
 # The ANOVA F-test tells us that adding the second variable significantly improves
 # the model.
 
