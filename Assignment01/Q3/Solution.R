@@ -241,7 +241,7 @@ numeric_air_data$ModelCat <- as.factor(
 summary(numeric_air_data)
 
 regmodel.c_2 <- lm(Price ~ RangeKm_2 + RangeKm + FC * ModelCat, data = numeric_air_data)
-summary(regmodel.c)
+summary(regmodel.c_2)
 plot(regmodel.c_2, which = 1, main = "RangeKm 2")
 
 # Compare model b to model c
