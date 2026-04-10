@@ -1,4 +1,4 @@
-llibrary(tidyverse)
+library(tidyverse)
 library(car)
 library(lmtest)
 
@@ -110,10 +110,12 @@ par(mfrow = c(1, 1))
 summary(slrmodel.a)
 
 Capacity_2 <- (numeric_air_data$Capacity)^2
-slr.capacity_2 <- lm(Price ~ Capacity+Capacity_2, data = numeric_air_data)
-summary(slr.capacity_2) # better results
+slrmodel.a_2 <- lm(Price ~ Capacity+Capacity_2, data = numeric_air_data)
+summary(slrmodel.a_2) # better results
 
-plot(slr.capacity_2, which = 1, main = "Capacity")
+plot(slrmodel.a_2, which = 1, main = "Capacity")
+
+anova(slrmodel.a, slrmodel.a_2)
 
 # Interpretation:
 # The best simple linear regression uses NumberofEngines as the predictor because it yields
@@ -197,9 +199,15 @@ anova(slrmodel.a, regmodel.b)
 # Adding RangeKm to the model decreases significantly the Residual Sum of Squares,
 # meaning the model improves by adding this new variable
 
+regmodel.b_2 <- lm(Price ~ Capacity + FC + Capacity_2, data = numeric_air_data)
+summary(regmodel.b_2)
+anova(regmodel.b, regmodel.b_2)
+
 # Compare SLR vs MLR using adjusted R-squared, AIC, and ANOVA
 cat("\nSLR Adj. R-squared:", summary(slrmodel.a)$adj.r.squared, "\n")
+cat("\nSLR_2 Adj. R-squared:", summary(slrmodel.a_2)$adj.r.squared, "\n")
 cat("MLR Adj. R-squared:", summary(regmodel.b)$adj.r.squared, "\n")
+cat("MLR_2 Adj. R-squared:", summary(regmodel.b_2)$adj.r.squared, "\n")
 
 # Interpretation:
 # The MLR model with NumberOfEngines + RangeKm do have a higher adjusted R-squared and
