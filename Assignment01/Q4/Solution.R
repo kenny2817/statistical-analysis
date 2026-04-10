@@ -82,9 +82,8 @@ summary(PCA.air)
 # PCA reduces the dimensionality of the numerical predictors into uncorrelated principal components.
 # - The scree plot and cumulative variance help decide how many PCs to retain (> 80%)
 # - The loadings show how each original variable contributes to each PC.
-#   PC1 captures airplane size (Capacity, RangeKm, NumberofEngines, FC)
-#   PC2 captures age-related variation (ProductionYear, Age).
-#.  PC3 captures mostly Hours of Maintainance
+#   PC1 captures airplane size (Capacity, RangeKm, FC)
+#   PC2 and PC3 captures age-related variation (HM, Age)
 # - The biplot visualizes observations and variable contributions simultaneously.
 
 
