@@ -236,39 +236,40 @@ cat("MLR_2 Adj. Residual standard error:", summary(regmodel.b_2)$sigma, "\n")
 
 numeric_air_data$ModelCat <- as.factor(
   ifelse(grepl("Airbus", air_data$Model, ignore.case = TRUE), "Airbus",
-  ifelse(grepl("Boeing", air_data$Model, ignore.case = TRUE), "Boeing", "Other"))
+         ifelse(grepl("Boeing", air_data$Model, ignore.case = TRUE), "Boeing", "Other"))
 )
 summary(numeric_air_data)
 
-regmodel.c <- lm(Price ~ NumberofEngines + RangeKm + ModelCat, data = numeric_air_data)
+regmodel.c_2 <- lm(Price ~ RangeKm_2 + RangeKm + FC * ModelCat, data = numeric_air_data)
 summary(regmodel.c)
+plot(regmodel.c_2, which = 1, main = "RangeKm 2")
 
 # Compare model b to model c
-anova(regmodel.b, regmodel.c)
+anova(regmodel.b_2, regmodel.c_2)
 
 # Adding ModelCat to the model decreases the Residual Sum of Squares,
 # meaning the model improves by adding this new variable
-summary(regmodel.c)
+summary(regmodel.c_2)
 
 
 # Regression Assumptions
 par(mfrow = c(1, 3))
 # Normality of the Error Term
-qqnorm(residuals(regmodel.c))
+qqnorm(residuals(regmodel.c_2))
+qqline(residuals(regmodel.c_2))
 # Using Histogram
-hist(residuals(regmodel.c))
+hist(residuals(regmodel.c_2))
 
 # Homogeneity of Variance
-plot(residuals(regmodel.c))
+plot(residuals(regmodel.c_2))
 # Breusch Pagan
-bptest(regmodel.c)
+bptest(regmodel.c_2)
 
 # Independence of errors
-dwtest(regmodel.c, alternative = "two.sided")
+dwtest(regmodel.c_2, alternative = "two.sided")
 par(mfrow = c(1, 1))
 
 # Interpretation:
-
 
 
 # ------------------------------------------ D ------------------------------------------
