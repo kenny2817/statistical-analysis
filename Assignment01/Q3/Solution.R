@@ -240,9 +240,9 @@ numeric_air_data$ModelCat <- as.factor(
 )
 summary(numeric_air_data)
 
-regmodel.c_2 <- lm(Price ~ RangeKm_2 + RangeKm + FC * ModelCat, data = numeric_air_data)
+regmodel.c_2 <- lm(Price ~ RangeKm_2 * ModelCat + RangeKm + FC, data = numeric_air_data)
 summary(regmodel.c_2)
-plot(regmodel.c_2, which = 1, main = "RangeKm 2")
+
 
 # Compare model b to model c
 anova(regmodel.b_2, regmodel.c_2)
@@ -251,25 +251,36 @@ anova(regmodel.b_2, regmodel.c_2)
 # meaning the model improves by adding this new variable
 summary(regmodel.c_2)
 
+# Adding ModelCat to the model makes FC not significant and unnecessary,
+# so we decided to drop it, and simplify the model
+regmodel.c_3 <- lm(Price ~ RangeKm_2 * ModelCat + RangeKm, data = numeric_air_data)
+summary(regmodel.c_3)
+anova(regmodel.c_2, regmodel.c_3)
+
+regmodel.c <- regmodel.c_3
+
+plot(regmodel.c, which = 1, main = "RangeKm 2")
+
 
 # Regression Assumptions
 par(mfrow = c(1, 3))
 # Normality of the Error Term
-qqnorm(residuals(regmodel.c_2))
-qqline(residuals(regmodel.c_2))
+qqnorm(residuals(regmodel.c))
+qqline(residuals(regmodel.c))
 # Using Histogram
-hist(residuals(regmodel.c_2))
+hist(residuals(regmodel.c))
 
 # Homogeneity of Variance
-plot(residuals(regmodel.c_2))
+plot(residuals(regmodel.c))
 # Breusch Pagan
-bptest(regmodel.c_2)
+bptest(regmodel.c)
 
 # Independence of errors
-dwtest(regmodel.c_2, alternative = "two.sided")
+dwtest(regmodel.c, alternative = "two.sided")
 par(mfrow = c(1, 1))
 
 # Interpretation:
+# 
 
 
 # ------------------------------------------ D ------------------------------------------
