@@ -108,6 +108,7 @@ anova(regmodel.pca3, regmodel.pca2)
 
 # Comparing the models choosing 2 PC vs 3 PC show us that the first two components
 # are enough to predict Price with the same prediction power R2
+plot(regmodel.pca2, which = 1, main = "2 PC")
 regmodel.b <- regmodel.pca2
 
 
@@ -127,6 +128,29 @@ bptest(regmodel.b)
 # Independence of errors
 dwtest(regmodel.b, alternative = "two.sided")
 par(mfrow = c(1, 1))
+
+
+# Test model
+n <- nrow(final_model_data)
+train.sample <- sample(1:n, round(0.8*n))
+train.set <- final_model_data[train.sample, ] 
+test.set <- final_model_data[-train.sample, ]
+
+train.model <- lm(Price ~ ., data = train.set)
+summary(train.model)
+
+yhat <- predict(train.model, test.set, interval="prediction")
+
+y <- test.set$Price
+
+error <- cbind(yhat[,1,drop=FALSE], y, (y-yhat[,1])^2)
+sqr_err <- error[, 3]
+mse <- mean(sqr_err) 
+print(mse)
+
+plot(y, yhat[,1], xlab = "Actual Price", ylab = "Predicted Price", 
+     main = "Predicted vs. Actual")
+abline(a = 0, b = 1, col = "red")
 
 
 # ------------------------------------------ C ------------------------------------------
