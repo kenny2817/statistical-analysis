@@ -45,7 +45,7 @@ for (var in num_vars) {
 }
 par(mfrow = c(1, 1))
 
-# According to plot analysis, we are selecting variables NumberOfEngines, Capacity, and RangeKm
+# According to plot analysis, we are selecting variables Capacity, and RangeKm, and FC
 # as best candidates for the linear model bc those show the most linear relationship with Price
 
 numeric_air_data <- air_data[, num_vars]
@@ -56,7 +56,7 @@ str(numeric_air_data)
 cor_matrix <- cor(numeric_air_data)
 cor_matrix["Price", colnames(cor_matrix) != "Price" ]
 
-# Correlation Matrix tell us indeed that Capacity, RangeKm and FuelConsumption are the top 3 
+# Correlation Matrix tell us indeed that Capacity, RangeKm and FC are the top 3 
 # with the highest correlation
 
 # Linear Models
@@ -75,26 +75,39 @@ scatterplot(Price~FC, regLine=lm, smooth=FALSE, data=numeric_air_data)
 scatterplot(Price~Capacity, regLine=lm, smooth=FALSE, data=numeric_air_data)
 scatterplot(Price~RangeKm, regLine=lm, smooth=FALSE, data=numeric_air_data)
 par(mfrow = c(1, 1))
-# The plots suggest that:
-# - NumberofEngines is showing a nearly linear relationship with Price
-# - In the case of Capacity and RangeKm, the model may need to include a quadratic term
 
 
 # ANOVA confirms Capacity yields lower RSS
 anova(slr.capacity, slr.range)
 anova(slr.capacity, slr.FC)
 
-slrmodel.a <- slr.capacity
+
+# The residual vs fitted suggest a quadratic relationship
+Capacity_2 <- (numeric_air_data$Capacity)^2
+slrmodel.a1 <- lm(Price ~ Capacity + Capacity_2, data = numeric_air_data)
+summary(slrmodel.a1)
+RangeKm_2 <- (numeric_air_data$RangeKm)^2
+slrmodel.a2 <- lm(Price ~ RangeKm + RangeKm_2, data = numeric_air_data)
+summary(slrmodel.a2)
+
+par(mfrow = c(1, 2))
+plot(slrmodel.a1, which = 1, main = "Capacity")
+plot(slrmodel.a2, which = 1, main = "RangeKm")
+par(mfrow = c(1, 1))
+
+
+anova(slrmodel.a1, slrmodel.a2)
+slrmodel.a <- slrmodel.a2
+summary(slrmodel.a)
 
 
 # Regression Assumptions
-par(mfrow = c(1, 2))
+par(mfrow = c(1, 3))
 # Normality of the Error Term
 qqnorm(residuals(slrmodel.a))
 qqline(residuals(slrmodel.a), col = "red")
 hist(residuals(slrmodel.a))
 
-par(mfrow = c(1, 1))
 # Homogeneity of Variance
 plot(residuals(slrmodel.a))
 # Breusch Pagan
@@ -103,29 +116,6 @@ bptest(slrmodel.a) # p-value < 0.05
 # Independence of errors
 dwtest(slrmodel.a, alternative = "two.sided")
 par(mfrow = c(1, 1))
-
-# We selected NumberofEngines as the best single predictor because it shows a linear high correlation vs Price
-# and also high R-squared value, meaning it alone explains the highest proportion of the variance in airplane prices
-
-summary(slrmodel.a)
-
-Capacity_2 <- (numeric_air_data$Capacity)^2
-slrmodel.a_2 <- lm(Price ~ Capacity+Capacity_2, data = numeric_air_data)
-summary(slrmodel.a_2) # better results
-
-plot(slrmodel.a_2, which = 1, main = "Capacity")
-
-anova(slrmodel.a, slrmodel.a_2)
-
-# Interpretation:
-# The best simple linear regression uses NumberofEngines as the predictor because it yields
-# the highest R-squared among all numerical variables. This makes sense since larger
-# more powerful planes (more engines) cost significantly more.
-# Coefficients:
-#   Intercept: the expected log(Price) when NumberOfEngines = 0 (theoretical, not meaningful).
-#   Slope (NumberOfEngines): for each additional unit of NumberOfEngines, log(Price) increases by
-#   this amount. In original scale, a one-unit increase in NumberOfEngines multiplies the
-#   price by exp(slope).
 
 
 # ------------------------------------------ B ------------------------------------------
@@ -136,7 +126,6 @@ anova(slrmodel.a, slrmodel.a_2)
 
 regmodel.all <- lm(Price ~ ., data = numeric_air_data)
 summary(regmodel.all)
-# do have high significance when predicting the Price
 
 regmodel.best4 <- lm(Price ~ Capacity + RangeKm + FC + Age, data = numeric_air_data)
 summary(regmodel.best4)
@@ -151,8 +140,8 @@ cor(numeric_air_data[,-price.col])
 vif(regmodel.best4)
 # Correlation Matrix and VIF tell us that Capacity and RangeKm are highly correlated
 # VIF also tell us that there is a multicollinearity problem within our predictors
-# We dropped Capacity as it has higher VIF
 
+# We dropped Capacity as it has higher VIF
 
 regmodel.best3 <- lm(Price ~ RangeKm + FC + Age, data = numeric_air_data)
 summary(regmodel.best3)
@@ -170,21 +159,31 @@ anova(regmodel.best3, regmodel.b1)  # Drop Age predictor
 anova(regmodel.best3, regmodel.b2)  # Drop FC predictor
 # After comparing both models, dropping each extra predictor, we observe that keeping
 # FC predictor leads to higher R2 (prediction power) and a smaller Sum of Square Residuals
-
-# So, we decided to choose RangeKm +  FC
 regmodel.b <- regmodel.b1
+
+# Adding RangeKm^2 to the model decreases significantly the Residual Sum of Squares,
+# meaning the model improves by adding this new variable
+
+RangeKm_2 <- (numeric_air_data$RangeKm)^2
+regmodel.b_2 <- lm(Price ~ RangeKm_2 + RangeKm + FC, data = numeric_air_data)
+summary(regmodel.b_2)
+
+anova(regmodel.b_2, regmodel.b)
+plot(regmodel.b_2, which = 1, main = "RangeKm 2")
+
+# So, we decided to choose RangeKm + RangeKm^2 + FC
+regmodel.b <- regmodel.b_2
 summary(regmodel.b)
 
 # Regression Assumptions
-par(mfrow = c(1, 2))
+par(mfrow = c(1, 3))
 # Normality of the Error Term
 qqnorm(residuals(regmodel.b))
-qqline(residuals(regmodel.b))
+qqline(residuals(regmodel.b), col = "red")
 # Using Histogram
 hist(residuals(regmodel.b))
 
 # Homogeneity of Variance
-par(mfrow = c(1, 1))
 plot(residuals(regmodel.b))
 # Breusch Pagan
 bptest(regmodel.b) # p-value < 0.05 shows heteroscedasticity!!!
@@ -197,34 +196,18 @@ par(mfrow = c(1, 1))
 # Compare model a with model b
 anova(slrmodel.a, regmodel.b)
 
-# Adding RangeKm to the model decreases significantly the Residual Sum of Squares,
-# meaning the model improves by adding this new variable
-
-RangeKm_2 <- (numeric_air_data$RangeKm)^2
-regmodel.b_2 <- lm(Price ~ RangeKm_2 + RangeKm + FC, data = numeric_air_data)
-summary(regmodel.b_2)
-
-anova(regmodel.b_2, regmodel.b)
-plot(regmodel.b_2, which = 1, main = "RangeKm 2")
-
 
 # Compare SLR vs MLR using adjusted R-squared, AIC, and ANOVA
 cat("\nSLR Adj. R-squared:", summary(slrmodel.a)$adj.r.squared, "\n")
-cat("\nSLR_2 Adj. R-squared:", summary(slrmodel.a_2)$adj.r.squared, "\n")
+cat("\nSLR_2 Adj. R-squared:", summary(slrmodel.a2)$adj.r.squared, "\n")
 cat("MLR Adj. R-squared:", summary(regmodel.b)$adj.r.squared, "\n")
 cat("MLR_2 Adj. R-squared:", summary(regmodel.b_2)$adj.r.squared, "\n")
 
 cat("\nSLR Adj. Residual standard error:", summary(slrmodel.a)$sigma, "\n")
-cat("\nSLR_2 Adj. Residual standard error:", summary(slrmodel.a_2)$sigma, "\n")
+cat("\nSLR_2 Adj. Residual standard error:", summary(slrmodel.a2)$sigma, "\n")
 cat("MLR Adj. Residual standard error:", summary(regmodel.b)$sigma, "\n")
 cat("MLR_2 Adj. Residual standard error:", summary(regmodel.b_2)$sigma, "\n")
 
-
-# Interpretation:
-# The MLR model with RangeKm + FC do have a higher adjusted R-squared 
-# than the SLR with Capacity alone, indicating a better fit.
-# The ANOVA F-test tells us that adding the second variable significantly improves
-# the model.
 
 
 # ------------------------------------------ C ------------------------------------------
@@ -242,14 +225,12 @@ summary(numeric_air_data)
 
 regmodel.c_2 <- lm(Price ~ RangeKm_2 * ModelCat + RangeKm + FC, data = numeric_air_data)
 summary(regmodel.c_2)
-
+# Adding ModelCat to the model decreases the Residual Sum of Squares,
+# meaning the model improves by adding this new variable
 
 # Compare model b to model c
 anova(regmodel.b_2, regmodel.c_2)
 
-# Adding ModelCat to the model decreases the Residual Sum of Squares,
-# meaning the model improves by adding this new variable
-summary(regmodel.c_2)
 
 # Adding ModelCat to the model makes FC not significant and unnecessary,
 # so we decided to drop it, and simplify the model
@@ -266,7 +247,7 @@ plot(regmodel.c, which = 1, main = "RangeKm 2")
 par(mfrow = c(1, 3))
 # Normality of the Error Term
 qqnorm(residuals(regmodel.c))
-qqline(residuals(regmodel.c))
+qqline(residuals(regmodel.c), col = "red")
 # Using Histogram
 hist(residuals(regmodel.c))
 
