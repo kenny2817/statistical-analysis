@@ -196,7 +196,8 @@ numeric_air_data$ModelCat <- as.factor(
 )
 summary(numeric_air_data)
 
-regmodel.q3 <- lm(Price ~ NumberofEngines + RangeKm + ModelCat, data = numeric_air_data)
+RangeKm_2 <- (numeric_air_data$RangeKm)^2
+regmodel.q3 <- lm(Price ~ RangeKm_2 * ModelCat + RangeKm, data = numeric_air_data)
 summary(regmodel.q3)
 
 # Compare model b vs previous model in Q3
