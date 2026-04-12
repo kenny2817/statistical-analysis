@@ -22,7 +22,7 @@ As shown in Figure 1, Principal Component 1 (PC1) accounts for 45.95% of the tot
 
 - Elbow Rule: If we were to strictly follow the "elbow" or bend in the scree plot (see Figure 2), the most significant drop occurs after PC1.
 
-Balancing these methods, we have elected to retain the first three components to ensure a comprehensive representation of the dataset’s variance.
+Balancing these methods, we would retain the first three components to ensure a comprehensive representation of the dataset’s variance.
 
 ![figure3](./biplot-dots.png)
 *Figure 3*
@@ -37,52 +37,61 @@ Balancing these methods, we have elected to retain the first three components to
 
 Figure 3 provides a biplot that includes the individual observations. We can observe that the data points are spread across the first two components, clearly forming four distinct clusters.
 
-In Figure 5, we included Price as a supplementary variable (indicated by the blue dashed line). While Price was not used to calculate the principal components to avoid biasing the model, it is highly correlated with the first dimension. Specifically, it aligns closely with Capacity and RangeKm, confirming that higher-capacity, longer-range vehicles tend to have a higher price point, while being inversely related to FC.
+In Figure 5, we included Price as a supplementary variable (indicated by the blue dashed line). While Price was not used to calculate the principal components to avoid biasing the model, it is highly correlated with the first dimension. Specifically, it aligns closely with Capacity and RangeKm, confirming that higher-capacity, longer-range vehicles tend to have a higher price point, while being inversely related to FuelConsumption (FC).
 
-### Technical Differences in Visualization
+The first dimension captures the scale and performance of the aircraft, and seems to be the primary driver of Price. While the second dimension could represent the operational lifecycle of the airplane. Because the second dimension is orthogonal to the price, price is not affected by the operational lifecycle, age and Hourly Maintainance (HM).
 
-**Biplots** (Figures 4 & 5): Figure 3 display both the observations and the variable vectors while in Figure 4 observations were removed for better visualization of variables. The axes are scaled based on the principal component scores (calculated via eigenvectors). 
+- Top-Right: Large, high-range planes that are older and expensive to maintain.
 
-**Correlation Circle** (Figure 5): Unlike the biplot, this plot standardizes the variables within a unit circle. The length and direction of the arrows represent the correlation coefficients between the variables and the dimensions. This is the most effective tool for observing how variables relate to one another and to the underlying components.
+- Bottom-Right: Large, modern, high-range planes with relatively lower maintenance needs.
+
+- Top-Left: Small, fuel-efficient planes that are older and need a lot of work.
+
+- Bottom-Left: Small, modern, highly efficient planes (the entry-level newer models).
 
 ### Assumptions
 
-#### Kaiser-Meyer-Olkin (KMO) Test
+![figure6](./KMO.png)  
+*Figure 6*
 
-![figure04](./KMO.png)  
-*Figure 04*
+![figure7](./bartlett.png)  
+*Figure 7*
 
-#### Bartlett’s test of sphericity
+![figure8](./linearity.png)  
+*Figure 8*
+
+- KMO Test (Figure 6): The overall KMO value is 0.533, which is below 0.6. Notably, Age shows the highest individual adequacy at 0.824.
+
+- Bartlett’s Test (Figure 7): Our result shows a p-value of 0 ($p < 0.05$), confirming that the variables are sufficiently related to justify PCA.
+
+- Linearity (Figure 8): PCA assumes linear relationships between variables. The scatterplot matrix confirms a strong linear trend between Capacity and RangeKm, though relationships with other variables are less defined.
 
 ## Find the best linear model to predict price on the principal components. Do not forget to test the assumptions and the validity of the model.
 
-![figure04](./04-lm-pc.png)
-*Figure 04*
+![figure9](./lm5pca.png)  
+*Figure 9*
 
-#### Model 3 PC vs Model 2 PC comparison
+![figure10](./lm5pca-res.png)
+*Figure 10*
 
-![figure05](./05-anova.png)
-*Figure 05*
+After doing an ANOVA analysis and AIC with four components subtracting each of the component per try, we conclude that the best linear regression model is to take into account the five principle components even component 2 is the less significant, could be seen with orthogonality to price in PCA. Also in the model coefficients, Figure 9 we can see that the p-vlaue is very low for each component so removing one component of from the model could reduce performance. The Figure 10 shows a parabolic curve so it might suggest that there are quadratic relations between variables and price.
 
-After doing an ANOVA analysis with a linear model with 3 PC vs 2PC, it confirms that model with the first 3 PC is not significantly better than the model with 2 PC. We decided to select only the top 2 most important PC for our model.
+We don't need to test collinearity with vif() beacuse components are orthogonal between them (no correlation).
 
-#### Regression assumptions analysis
+#### Assumptions
 
-![figure06](./06-modelb-assumptions.png)
-*Figure 06*
+![figure11](./lmpca5-assumptions.png)
+*Figure 11*
 
-> This model shows p-value < 0.05 on the Breusch-Pagan, meaning it has signs of heteroscedasticity. Also now, the Durbin-Watson test on the PCA model shows significance (autocorrelation).
+- Normality (Figure 11 first and second plot): The histogram and Q-Q plot indicate that the residuals are generally normal but moderately left-skewed. While not a perfect bell curve, the large sample size invokes the Central Limit Theorem.
 
-#### Conclusion
+- Homoscedastacity (Figure 11 third plot): Although the Breusch-Pagan test suggests heteroscedasticity due to its extreme sensitivity to large samples, the Residuals vs Index plot shows a consistent spread across the entire range. We conclude the variance is sufficiently constant
 
-The previous linear model tell us that the first 3 PC do have high significance when predicting the Price. This alligns with the model selected in **Q3** as PC1 is influenced by NumberofEngines, Capacity, and RangeKm, and PC2 is dominated by ProductionYear and Age.
-
+- Independence of errors: The Durbin-Watson test yielded a p-value of 0.4562, failing to reject the null hypothesis of no autocorrelation.
 
 ## Would you prefer the linear model that you fit in the final step of question 3 or this one? Explain why.
 
-![figure07](./07-modelb-vs-q3.png)
-*Figure 07*
 
-- **Prediction Power**: Both models have similar prediction power R2. We prefered the **Q3** model because it has lower RSS.
-- **Interpretability**: Q3 model uses original variables (Capacity, RangeKm, Manufacturer) which are directly interpretable. PCA model uses abstract components that are harder to explain to stakeholders.
-- **Assumption violations**: Also the PCA model shows significant autocorrelation and heteroscedasticity.
+We prefer the Multiple Linear Regression (MLR) model from Question 3 over the Principal Component Regression (PCR) model. Although the MLR model utilizes six variables, because of the interaction of Model and RangeKm, compared to the five underlying the PCA components, it demonstrates superior performance across all key metrics. Specifically, the MLR model achieves a higher Adjusted $R^2$ and a lower Residual Standard Error, indicating a tighter fit to the data. 
+
+The most compelling evidence lies in the Mean Squared Error (MSE) results. The MLR model produced an MSE of 0.07, significantly lower than the 0.53 observed in the PCA model. This indicates that the MLR model is substantially more precise at predicting airplanes prices, justifying the slight increase in model complexity.
