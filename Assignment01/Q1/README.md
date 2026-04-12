@@ -4,17 +4,23 @@
 
 ```r
 air_data <- read.csv("./data/airplane_price_dataset.csv", sep=",", stringsAsFactors=TRUE)
-
-air_data <- air_data %>%
+air_data <- air_data |>
   rename(
     FC = FuelConsumption.L.h.,
     HM = HourlyMaintenance...,
     Price = Price...
   )
 air_data$EngineType <- as.factor(air_data$EngineType)
+air_data$NumberofEngines <- as.factor(air_data$NumberofEngines) # only 2 different amount of engines
+air_data$ProductionYear <- as.factor(air_data$ProductionYear)
 
 str(air_data)
 ```
+
+After analyzing the data we decided to:
+
+- Rename long name variables for better handling.
+- Convert to factors `EngineType`, `NumberofEngines`, and `ProductionYear` as they have little variation.
 
 
 ## Summarize the variables Price, Fuel Consumption first for the all data and then for the groups of Engine Type
@@ -67,7 +73,7 @@ Since the p-value is < 0.05, we reject the null hypothesis and conclude there is
 - We are 95% confident that the true population mean of FC for Piston engines lies within that interval **(29.61919, 30.62560)**.
 - Similarly, the 95% CI for Turbofan is **(8.443816, 8.588554)**.
 
-The two intervals do NOT overlap, this provides visual evidence that the mean Fuel Consumption differs significantly between the two engine types.
+The two intervals **do not** overlap, this provides visual evidence that the mean Fuel Consumption differs significantly between the two engine types.
 
 
 ## Check the association between Model and Sales Region in the whole sample using proper method and interpret your findings
@@ -101,6 +107,8 @@ summary(filtered_air_data)
 ![figure06](./06-boxplot-logprice-by-type.png)
 *Figure 06*
 
+Both plots show a nearly normal distributed data across the two categories.
+
 ![figure07](./07-plot-logprice-by-type.png)
 *Figure 07*
 
@@ -108,7 +116,7 @@ summary(filtered_air_data)
 #### Conclusion
 
 - We applied a log() transformation to Price to correct for positive (right) skewness and better approximate a normal distribution.
-- We can conclude that there is a significant different of Price between the two types of Engines.
+- We can conclude that there is a significant difference of Price between the two types of Engines.
 
 
 ## Categorize the variable Price into two categories as “Low” and “High” by cutting from the median and save it as a new variable into your data frame
@@ -129,8 +137,8 @@ filtered_air_data$Price_Category <- factor(
 
 #### Interpretation of Conditional Probabilities
 
-- Row proportions P(PriceCategory | Model) show, for each model, what proportion of its airplanes fall into "Low" vs "High" price. Since Bombardier CRJ200 (Turbofan) has much higher prices than Cessna 172 (Piston), we expect nearly all Bombardier CRJ200 to be in the "High" category and nearly all Cessna 172 to be in the "Low" category.
-- Column proportions P(Model | PriceCategory) show, for each price category, what proportion belongs to each model. The "Low" category is dominated by Cessna 172 and the "High" category by Bombardier CRJ200, so it confirms a strong association between airplane model and price level.
+- **Row proportions P(PriceCategory | Model)**: show, for each model, what proportion of its airplanes fall into "Low" vs "High" price. Since Bombardier CRJ200 (Turbofan) has much higher prices than Cessna 172 (Piston), we expect nearly all Bombardier CRJ200 to be in the "High" category and nearly all Cessna 172 to be in the "Low" category.
+- **Column proportions P(Model | PriceCategory)**: show, for each price category, what proportion belongs to each model. The "Low" category is dominated by Cessna 172 and the "High" category by Bombardier CRJ200. This also confirms a strong association between airplane model and price level.
 
 
 ## Is there an association between the model of the airplane and its price level. Analyze it by using proper statistical method
@@ -142,7 +150,7 @@ print(test_model_price)
 
 #### Conclusion
 
-The p-value < 0.05, so we reject the null hypothesis and conclude there is a statistically significant association between airplane model and price level. Given that Bombardier CRJ200 (Turbofan) costs millions while Cessna 172 (Piston) costs hundreds of thousands, we expect a very small p-value, confirming a strong association.
+The p-value < 0.05, so we reject the null hypothesis and conclude there is a statistically significant association between airplane model and price level, as expected.
 
 <div style="page-break-after: always;"></div>
 
@@ -153,8 +161,8 @@ The p-value < 0.05, so we reject the null hypothesis and conclude there is a sta
 
 #### Interpretation of Conditional Probabilities
 
-- P(SalesRegion | Model) (row proportions): shows the distribution of sales regions for each model. Both models have similar proportions across regions, so we conclude that the sales region is independent of the model.
-- P(Model | SalesRegion) (column proportions): shows, within each region, what share belongs to each model. Both models appear in roughly equal proportions within every region, so this supports our independence assumption.
+- **Row proportions P(SalesRegion | Model)**: shows the distribution of sales regions for each model. Both models have similar proportions across regions, so we conclude that the sales region is independent of the model.
+- **Column proportions P(Model | SalesRegion)**: shows, within each region, what share belongs to each model. Both models appear in roughly equal proportions within every region, so this supports our independence assumption.
 
 #### Conclusion
 

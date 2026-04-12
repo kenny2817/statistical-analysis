@@ -127,10 +127,6 @@ leveneTest(FC ~ EngineType, data = air_data)
 # Welch's t-test (does not assume equal variances)
 t.test(FC ~ EngineType, data = air_data)
 
-# p-value < 2.2e-16, alternative hypothesis: true difference in means between group 
-# Piston and group Turbofan is not equal to 0
-# 95 percent confidence interval:
-#  21.09784 22.11459
 
 # ------------------------------------------ D ------------------------------------------
 # Construct 95% confidence intervals for the mean of two groups and interpret them.
