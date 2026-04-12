@@ -2,32 +2,59 @@
 
 ## Apply PCA analysis on airplane data and interpret the results of the analysis.
 
-![figure01](./01-pca.png)
-*Figure 01*
+We applied a log transformation to the Price variable, consistent with the methodology in Q3, even though it was not utilized directly as an input for the PCA.
 
-![figure02](./02-plot-pca.png)
-*Figure 02*
+To ensure a robust analysis, we performed the PCA using two functions: princomp() and PCA(). Both methods yielded identical results, identifying five principal components based on the calculated eigenvalues.
 
-![figure03](./03-pca-loadings.png)
-*Figure 03*
+![figure1](./eigen-val.png)  
+*Figure 1*
 
-#### Conclusion
+![figure2](./eigen-values-plot.png)
+*Figure 2*
 
-- **PC1**: This component is heavily influenced by NumberofEngines (-0.496), Capacity (-0.529), and RangeKm (-0.513). It captures the size and performance of the planes. Since these are all negative, a "low" score on PC1 actually represents a large, powerful plane with many engines and high capacity.
-- **PC2**: This is dominated by ProductionYear (0.706) and Age (-0.706). Since Year and Age are opposites, this component perfectly captures the "newness" of the plane. High values for PC2 mean a newer asset (higher year, lower age).
-- **PC3**: This component is almost entirely HM (0.975). This is saying that the Price increases with more Maintainance Hours.
+### Discussion of Variance and Selection Criteria
 
-The output of the PCA and the plot show that the first three components account for the ~85 percent of the data variation and also have eigenvalues > 1. We decided to choose the **three most important components** for the analysis.
+As shown in Figure 1, Principal Component 1 (PC1) accounts for 45.95% of the total variance, while PC2 and PC3 explain approximately 20% each. To determine the optimal number of components to retain, we evaluated three standard criteria:
 
+- 80% Variance Rule: To capture at least 80% of the information, we must retain the first three components, which collectively explain 85.96% of the total variation.
+
+- Kaiser’s Rule: While PC1 and PC2 strictly meet this requirement, PC3 is a borderline case with an eigenvalue of 0.989 (see Figure 1). Given how close this value is to 1, retaining PC3 is statistically justifiable to meet our variance threshold.
+
+- Elbow Rule: If we were to strictly follow the "elbow" or bend in the scree plot (see Figure 2), the most significant drop occurs after PC1.
+
+Balancing these methods, we have elected to retain the first three components to ensure a comprehensive representation of the dataset’s variance.
+
+![figure3](./biplot-dots.png)
+*Figure 3*
+
+![figure4](./biplot.png)
+*Figure 4*
+
+![figure5](./PCA.png)
+*Figure 5*
+
+### Interpretation of components
+
+Figure 3 provides a biplot that includes the individual observations. We can observe that the data points are spread across the first two components, clearly forming four distinct clusters.
+
+In Figure 5, we included Price as a supplementary variable (indicated by the blue dashed line). While Price was not used to calculate the principal components to avoid biasing the model, it is highly correlated with the first dimension. Specifically, it aligns closely with Capacity and RangeKm, confirming that higher-capacity, longer-range vehicles tend to have a higher price point, while being inversely related to FC.
+
+### Technical Differences in Visualization
+
+**Biplots** (Figures 4 & 5): Figure 3 display both the observations and the variable vectors while in Figure 4 observations were removed for better visualization of variables. The axes are scaled based on the principal component scores (calculated via eigenvectors). 
+
+**Correlation Circle** (Figure 5): Unlike the biplot, this plot standardizes the variables within a unit circle. The length and direction of the arrows represent the correlation coefficients between the variables and the dimensions. This is the most effective tool for observing how variables relate to one another and to the underlying components.
+
+### Assumptions
+
+#### Kaiser-Meyer-Olkin (KMO) Test
+
+![figure04](./KMO.png)  
+*Figure 04*
+
+#### Bartlett’s test of sphericity
 
 ## Find the best linear model to predict price on the principal components. Do not forget to test the assumptions and the validity of the model.
-
-```r
-pca_data <- as.data.frame(planes_pc$scores[, 1:3])
-final_model_data <- cbind(Price = air_data$Price, pca_data)
-regmodel.pca <- lm(Price ~ ., data = final_model_data)
-summary(regmodel.pca)
-```
 
 ![figure04](./04-lm-pc.png)
 *Figure 04*
