@@ -38,7 +38,7 @@ air_data$NumberofEngines <- as.factor(air_data$NumberofEngines)
 
 # Price is generally right-skewed data; a log() transformation helps to normalize the data
 hist(air_data$Price)
-air_data$Price <- log(air_data$Price) # execute only
+air_data$Price <- log(air_data$Price) # execute only once
 hist(air_data$Price)
 
 # Numerical vars only (exclude Price since it is the response)
@@ -55,10 +55,10 @@ eigs
 plot(eigs, type = "b")
 
 planes_pc$loadings
-biplot(planes_pc, xlabs = rep("", nrow(air_data)))
+biplot(planes_pc, xlabs = rep(".", nrow(air_data)))
 plot(planes_pc)
 
-# We are selecting the first 3 components as they account for the ~85 percent of the 
+# We are selecting the first 3 components as they account for more of 80 percent of the 
 # data variation and also have eigenvalues > 1
 
 # PCA visualization
@@ -71,7 +71,7 @@ plot(PCA.air$eig[,1], type="o", main="Scree Plot")
 
 ## Component Loadings ## 
 PCA.air$var$coord
-PCA.air$var$coord[,1:2]
+PCA.air$var$coord[,1:3]
 
 # Scores of PC1 and PC2
 PCA.air$ind$coord[,1:2]
@@ -100,6 +100,8 @@ kmo <- function(x)
 #KMO index
 kmo(numeric_air_data[, names(numeric_air_data) != "Price"]) # Only Age and FC are above 0.6
 
+pairs(numeric_air_data[, names(numeric_air_data) != "Price"])
+
 # Normality: All variables and their linear combinations should be normally distributed.
 
 # Linearity: The relationships among pairs of variables should be linear.
@@ -124,24 +126,44 @@ kmo(numeric_air_data[, names(numeric_air_data) != "Price"]) # Only Age and FC ar
 # the assumptions and the validity of the model.
 # ---------------------------------------------------------------------------------------
 
-pca_3comps <- as.data.frame(planes_pc$scores[, 1:3])
-# Combine original Price with the first 3 components
-final_model_data <- cbind(Price = air_data$Price, pca_3comps)
-regmodel.pca3 <- lm(Price ~ ., data = final_model_data)
-summary(regmodel.pca3)
+pca_5comps <- as.data.frame(planes_pc$scores[, 1:5])
+# Combine original Price with all components
+final_model_data <- cbind(Price = air_data$Price, pca_5comps)
+regmodel.pca5 <- lm(Price ~ ., data = final_model_data)
+summary(regmodel.pca5)
 
-# Compare  model with 3 PC vs model with 2 PC
-pca_2comps <- as.data.frame(planes_pc$scores[, 1:2])
-final_model_data <- cbind(Price = air_data$Price, pca_2comps)
-regmodel.pca2 <- lm(Price ~ ., data = final_model_data)
-summary(regmodel.pca2)
+# Compare  model without PC 5
+regmodel.pca4 <- lm(Price ~ ., data = final_model_data[, names(final_model_data) != "Comp.5"])
+summary(regmodel.pca4)
+anova(regmodel.pca5, regmodel.pca4)
+AIC(regmodel.pca5, regmodel.pca4) # pca5 better
 
-anova(regmodel.pca3, regmodel.pca2)
+# Compare  model without PC 4
+regmodel.pca4 <- lm(Price ~ ., data = final_model_data[, names(final_model_data) != "Comp.4"])
+summary(regmodel.pca4)
+anova(regmodel.pca5, regmodel.pca4)
+AIC(regmodel.pca5, regmodel.pca4) # pca5 better
 
-# Comparing the models choosing 2 PC vs 3 PC show us that the first two components
-# are enough to predict Price with the same prediction power R2
-plot(regmodel.pca2, which = 1, main = "2 PC")
-regmodel.b <- regmodel.pca2
+# Compare  model without PC 3
+regmodel.pca4 <- lm(Price ~ ., data = final_model_data[, names(final_model_data) != "Comp.3"])
+summary(regmodel.pca4)
+anova(regmodel.pca5, regmodel.pca4)
+AIC(regmodel.pca5, regmodel.pca4) # pca5 better
+
+# Compare  model without PC 2
+regmodel.pca4 <- lm(Price ~ ., data = final_model_data[, names(final_model_data) != "Comp.2"])
+summary(regmodel.pca4)
+anova(regmodel.pca5, regmodel.pca4)
+AIC(regmodel.pca5, regmodel.pca4) # pca5 better
+
+# Compare  model without PC 1
+regmodel.pca4 <- lm(Price ~ ., data = final_model_data[, names(final_model_data) != "Comp.1"])
+summary(regmodel.pca4)
+anova(regmodel.pca5, regmodel.pca4)
+AIC(regmodel.pca5, regmodel.pca4) # pca5 better
+
+plot(regmodel.pca5, which = 1, main = "5 PC")
+regmodel.b <- regmodel.pca5
 
 
 # Regression Assumptions
@@ -154,7 +176,7 @@ hist(residuals(regmodel.b))
 
 # Homogeneity of Variance
 plot(residuals(regmodel.b))
-# Breusch Pagan
+  # Breusch Pagan
 bptest(regmodel.b)
 
 # Independence of errors
@@ -162,7 +184,7 @@ dwtest(regmodel.b, alternative = "two.sided")
 par(mfrow = c(1, 1))
 
 
-# Test model
+# Validity of the model
 n <- nrow(final_model_data)
 train.sample <- sample(1:n, round(0.8*n))
 train.set <- final_model_data[train.sample, ] 
@@ -189,19 +211,3 @@ abline(a = 0, b = 1, col = "red")
 # Would you prefer the linear model that you fit in the final step of question 3 or this one?
 # Explain why.
 # ---------------------------------------------------------------------------------------
-
-numeric_air_data$ModelCat <- as.factor(
-  ifelse(grepl("Airbus", air_data$Model, ignore.case = TRUE), "Airbus",
-         ifelse(grepl("Boeing", air_data$Model, ignore.case = TRUE), "Boeing", "Other"))
-)
-summary(numeric_air_data)
-
-RangeKm_2 <- (numeric_air_data$RangeKm)^2
-regmodel.q3 <- lm(Price ~ RangeKm_2 * ModelCat + RangeKm, data = numeric_air_data)
-summary(regmodel.q3)
-
-# Compare model b vs previous model in Q3
-anova(regmodel.b, regmodel.q3)
-# Model Q3 decreases the Residual Sum of Squares, meaning the model improves
-
-# Interpretation:
