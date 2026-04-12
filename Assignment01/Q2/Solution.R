@@ -55,13 +55,6 @@ lines(densityB737, col = "green")
 lines(densityB777, col = "purple")
 legend("topright", legend = levels(air_data$Model), col = c("red", "blue", "green", "purple"), lty = 1)
 
-# Interpretation:
-# After the log transformation, Price is approximately normally distributed overall.
-# Per model, Boeing 777 and Airbus A350 have higher mean log(Price) values reflecting
-# their larger capacity and longer range. Boeing 737 and Airbus A320 cluster at lower
-# price levels. Within each model, the log(Price) distribution is roughly symmetric,
-# confirming that log transformation was appropriate for subsequent ANOVA analysis.
-
 
 # ------------------------------------------ B ------------------------------------------
 # Analyze the numerical variables that are affected by the "Model". Test the assumptions of
@@ -114,14 +107,6 @@ pairwise.t.test(air_data$Price, air_data$Model, p.adjust.method = "bonferroni")
 # LSD
 LSD <- LSD.test(aov_price, "Model")
 print(LSD)
-
-# Interpretation:
-# The ANOVA p-value for Price is < 0.05, so at least one model has a significantly
-# different mean log(Price). The Tukey HSD test shows which specific pairs differ.
-# We expect Boeing 777 and Airbus A350 (wide-body, long-range) to have significantly
-# higher prices than Boeing 737 and Airbus A320 (narrow-body, short/medium-range).
-# FC, HM, and Age are likely NOT significantly different across models since all four
-# are Turbofan jets and the dataset appears to have similar distributions for these.
 
 
 # ------------------------------------------ C ------------------------------------------
