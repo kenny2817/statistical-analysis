@@ -41,6 +41,8 @@ In Figure 5, we included Price as a supplementary variable (indicated by the blu
 
 The first dimension captures the scale and performance of the aircraft, and seems to be the primary driver of Price. While the second dimension could represent the operational lifecycle of the airplane. Because the second dimension is orthogonal to the price, price is not affected by the operational lifecycle, age and Hourly Maintainance (HM).
 
+### Interpretation of quadrants
+
 - Top-Right: Large, high-range planes that are older and expensive to maintain.
 
 - Bottom-Right: Large, modern, high-range planes with relatively lower maintenance needs.
