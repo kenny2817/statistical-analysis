@@ -107,6 +107,10 @@ As seen in the plot, the observations are clustered into four distinct groups, m
 ## Would you prefer the linear model that you fit in the final step of question 3 or this one? Explain why.
 
 
-We prefer the Multiple Linear Regression (MLR) model from Question 3 over the Principal Component Regression (PCR) model. Although the MLR model utilizes six variables, because of the interaction of Model and RangeKm, compared to the five underlying the PCA components, it demonstrates superior performance across all key metrics. Specifically, the MLR model achieves a higher Adjusted $R^2$ and a lower Residual Standard Error, indicating a tighter fit to the data. 
+We prefer the Multiple Linear Regression (MLR) model from Question 3. While the Principal Component Regression (PCR) model is efficient using only two predictors ($PC1$ and $PC1^2$) to explain the data, the MLR model provides a much higher level of precision.
 
-The most compelling evidence lies in the Mean Squared Error (MSE) results. The MLR model produced an MSE of 0.07, significantly lower than the 0.527 observed in the PCA model. This indicates that the MLR model is substantially more precise at predicting airplanes prices, justifying the slight increase in model complexity.
+The performance gap is most evident in the Mean Squared Error (MSE). The MLR model achieved an MSE of 0.071, whereas the PCR model produced a significantly higher error of 0.527. 
+
+Although the MLR model introduces more complexity by using six variables (including the interaction between Model and RangeKm) and is very probably overfitting, in this case, we prioritize predictive accuracy over simplicity of the PCR model.
+
+The only case we will prefer the PCR model is in case we have to predict Prices of airplanes from out-of-sample data and the airplane does not belong to a model in the trained dataset.
