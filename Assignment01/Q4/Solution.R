@@ -71,7 +71,6 @@ plot(PCA.air$eig[,1], type="o", main="Scree Plot")
 
 ## Component Loadings ## 
 PCA.air$var$coord
-PCA.air$var$coord[,1:3]
 
 # Scores of PC1 and PC2
 PCA.air$ind$coord[,1:2]
@@ -127,44 +126,32 @@ pairs(numeric_air_data[, names(numeric_air_data) != "Price"])
 # ---------------------------------------------------------------------------------------
 
 pca_5comps <- as.data.frame(planes_pc$scores[, 1:5])
-# Combine original Price with all components
 final_model_data <- cbind(Price = air_data$Price, pca_5comps)
-regmodel.pca5 <- lm(Price ~ ., data = final_model_data)
-summary(regmodel.pca5)
 
-# Compare  model without PC 5
-regmodel.pca4 <- lm(Price ~ ., data = final_model_data[, names(final_model_data) != "Comp.5"])
-summary(regmodel.pca4)
-anova(regmodel.pca5, regmodel.pca4)
-AIC(regmodel.pca5, regmodel.pca4) # pca5 better
+# PCR with Comp.1
+regmodel.pca1 <- lm(Price ~ Comp.1, data = final_model_data)
+summary(regmodel.pca1)
+plot(regmodel.pca1, which = 1, main = "PCR")
 
-# Compare  model without PC 4
-regmodel.pca4 <- lm(Price ~ ., data = final_model_data[, names(final_model_data) != "Comp.4"])
-summary(regmodel.pca4)
-anova(regmodel.pca5, regmodel.pca4)
-AIC(regmodel.pca5, regmodel.pca4) # pca5 better
+# PCR with Comp.1 + Comp.1^2
+Comp.1_2 <- final_model_data[,2]^2
+regmodel.pca2 <- lm(Price ~ Comp.1+Comp.1_2, data = final_model_data)
+summary(regmodel.pca2)
+plot(regmodel.pca2, which = 1, main = "PCR")
 
-# Compare  model without PC 3
-regmodel.pca4 <- lm(Price ~ ., data = final_model_data[, names(final_model_data) != "Comp.3"])
-summary(regmodel.pca4)
-anova(regmodel.pca5, regmodel.pca4)
-AIC(regmodel.pca5, regmodel.pca4) # pca5 better
+anova(regmodel.pca1, regmodel.pca2)
+AIC(regmodel.pca1, regmodel.pca2) # second model is quite better
 
-# Compare  model without PC 2
-regmodel.pca4 <- lm(Price ~ ., data = final_model_data[, names(final_model_data) != "Comp.2"])
-summary(regmodel.pca4)
-anova(regmodel.pca5, regmodel.pca4)
-AIC(regmodel.pca5, regmodel.pca4) # pca5 better
+# PCR with Comp.1 + Comp.1^2 + Comp.4
 
-# Compare  model without PC 1
-regmodel.pca4 <- lm(Price ~ ., data = final_model_data[, names(final_model_data) != "Comp.1"])
-summary(regmodel.pca4)
-anova(regmodel.pca5, regmodel.pca4)
-AIC(regmodel.pca5, regmodel.pca4) # pca5 better
+regmodel.pca3 <- lm(Price ~ Comp.1+Comp.1_2+Comp.4, data = final_model_data)
+summary(regmodel.pca3)
+plot(regmodel.pca3, which = 1, main = "PCR")
 
-plot(regmodel.pca5, which = 1, main = "5 PC")
-regmodel.b <- regmodel.pca5
+anova(regmodel.pca2, regmodel.pca3)
+AIC(regmodel.pca2, regmodel.pca3) # even anova and AIC says that the model had a significant improve, we think that is better to avoid over fitting while using PCR
 
+regmodel.b <- regmodel.pca2
 
 # Regression Assumptions
 par(mfrow = c(1, 3))

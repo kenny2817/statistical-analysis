@@ -68,30 +68,45 @@ The first dimension captures the scale and performance of the aircraft, and seem
 
 ## Find the best linear model to predict price on the principal components. Do not forget to test the assumptions and the validity of the model.
 
-![figure9](./lm5pca.png)  
+![figure9](./pcr.png)  
 *Figure 9*
 
-![figure10](./lm5pca-res.png)
+![figure10](./pcr-res.png)
 *Figure 10*
 
-After doing an ANOVA analysis and AIC with four components subtracting each of the component per try, we conclude that the best linear regression model is to take into account the five principle components even component 2 is the less significant, could be seen with orthogonality to price in PCA. Also in the model coefficients, Figure 9 we can see that the p-vlaue is very low for each component so removing one component of from the model could reduce performance. The Figure 10 shows a parabolic curve so it might suggest that there are quadratic relations between variables and price.
+We evaluated several Principal Component Regression (PCR) specifications, concluding that the quadratic model (Figure 9) offers the most balanced performance.
 
-We don't need to test collinearity with vif() beacuse components are orthogonal between them (no correlation).
+Initially, we fitted a simple linear regression using only the first principal component (PC1), which captures the primary variance in Price (as shown in the Correlation Circle, Figure 5). While initial results were promising, the Residuals vs. Fitted plot revealed a distinct parabolic trend, signaling a violation of the linearity assumption. To address this, we introduced a quadratic term ($PC1^2$), which resulted in a substantial improvement in model fit (Figure 10). Both ANOVA (Partial F-test) and AIC comparisons statistically confirmed that the inclusion of the squared term was necessary to capture the non-linear relationship.
+
+Regarding the remaining components, we opted to exclude PC2 and PC3. PC2 is orthogonal to Price, offering no predictive power, while PC3 was primarily defined by Age and Hourly Maintenance (HM), variables which, in this specific dataset, showed weak correlation with the target. Even adding PC4 (mainly representing Fuel Consumption) showed some improvement in AIC, we ultimately chose to exclude it to prioritize model simplicity. By maintaining a simpler model, we reduce the risk of overfitting and ensure that the regression remains interpretable and generalizes effectively to new, out-of-sample data. PC5 was not utilized because of its low explanation in variance.
+
+We don't need to test collinearity with vif() because components are orthogonal between them (no correlation) and there is no linear association between a variable and its squared.
 
 #### Assumptions
 
-![figure11](./lmpca5-assumptions.png)
+![figure11](./pcr-assumptions.png)
 *Figure 11*
 
 - Normality (Figure 11 first and second plot): The histogram and Q-Q plot indicate that the residuals are generally normal but moderately left-skewed. While not a perfect bell curve, the large sample size invokes the Central Limit Theorem.
 
 - Homoscedastacity (Figure 11 third plot): Although the Breusch-Pagan test suggests heteroscedasticity due to its extreme sensitivity to large samples, the Residuals vs Index plot shows a consistent spread across the entire range. We conclude the variance is sufficiently constant
 
-- Independence of errors: The Durbin-Watson test yielded a p-value of 0.4562, failing to reject the null hypothesis of no autocorrelation.
+- Independence of errors: The Durbin-Watson test yielded a p-value of 0.4675, failing to reject the null hypothesis of no autocorrelation.
+
+### Validity
+
+![figure11](./pred.png)
+*Figure 11*
+
+We performed a validation using an 80/20 train-test split. Figure 11 displays the relationship between the Actual Prices in the test set and the Prices Predicted by the model.
+
+The model achieved a Mean Squared Error (MSE) of 0.53. While there is visible dispersion, this is a respectable result considering the model’s simplicity. It relies on only two predictors (the first principal component and its quadratic term) to explain the majority of the price variation.
+
+As seen in the plot, the observations are clustered into four distinct groups, maybe because of airplanes models.
 
 ## Would you prefer the linear model that you fit in the final step of question 3 or this one? Explain why.
 
 
 We prefer the Multiple Linear Regression (MLR) model from Question 3 over the Principal Component Regression (PCR) model. Although the MLR model utilizes six variables, because of the interaction of Model and RangeKm, compared to the five underlying the PCA components, it demonstrates superior performance across all key metrics. Specifically, the MLR model achieves a higher Adjusted $R^2$ and a lower Residual Standard Error, indicating a tighter fit to the data. 
 
-The most compelling evidence lies in the Mean Squared Error (MSE) results. The MLR model produced an MSE of 0.07, significantly lower than the 0.53 observed in the PCA model. This indicates that the MLR model is substantially more precise at predicting airplanes prices, justifying the slight increase in model complexity.
+The most compelling evidence lies in the Mean Squared Error (MSE) results. The MLR model produced an MSE of 0.07, significantly lower than the 0.527 observed in the PCA model. This indicates that the MLR model is substantially more precise at predicting airplanes prices, justifying the slight increase in model complexity.
