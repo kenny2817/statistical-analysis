@@ -32,16 +32,24 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\figsizetext]{Q4/PCA.png}
-    \caption{PCA Correlation Circle with Price as a supplementary variable}
-    \label{fig:q4_05}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=1.2\linewidth]{Q4/PCA.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=1.2\linewidth]{Q4/biplot-dots.png}
+    \end{minipage}
+    \caption{PCA Correlation Circle with Price as a supplementary variable and PCA Biplot with individual observations}
+    \label{fig:q4_03}
 \end{figure}
 
 \subsubsection*{Interpretation of components}
 
 Figure \ref{fig:q4_03} provides a biplot that includes the individual observations. We can observe that the data points are spread across the first two components, clearly forming four distinct clusters.
 
-In Figure \ref{fig:q4_05}, we included Price as a supplementary variable (indicated by the blue dashed line). While Price was not used to calculate the principal components to avoid biasing the model, it is highly correlated with the first dimension. Specifically, it aligns closely with Capacity and RangeKm, confirming that higher-capacity, longer-range vehicles tend to have a higher price point, while being inversely related to FuelConsumption (FC).
+In Figure \ref{fig:q4_03}, we included Price as a supplementary variable (indicated by the blue dashed line). While Price was not used to calculate the principal components to avoid biasing the model, it is highly correlated with the first dimension. Specifically, it aligns closely with Capacity and RangeKm, confirming that higher-capacity, longer-range vehicles tend to have a higher price point, while being inversely related to FuelConsumption (FC).
 
 The first dimension captures the scale and performance of the aircraft, and seems to be the primary driver of Price. While the second dimension could represent the operational lifecycle of the airplane. Because the second dimension is orthogonal to the price, price is not affected by the operational lifecycle, age and Hourly Maintenance (HM).
 
