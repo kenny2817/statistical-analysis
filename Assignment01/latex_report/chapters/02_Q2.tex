@@ -85,13 +85,6 @@ We applied ANOVA and the results are reported in table \ref{tab:05}. There is no
 
 To compute the categorization of Production Year we first calculated the median and then applied it to a new variable: $year\_cat$.
 
-\begin{verbatim}
-    median = median(air_data$ProductionYear)
-    air_data$year_cat <- as.factor(
-        ifelse(air_data$ProductionYear < median, "Older", "Newer")
-    )
-\end{verbatim}
-
 \subsection[Q2-e]{Analyze the effect of Model and year ("year\_cat") together on the price. Analyze whether the interaction of two term is significant. Interpret your findings.}
 
 Figure \ref{fig:06} plot aligns with previous analysis: there are two cheaper plane models and two expensive ones, and now we observe that there are older and newer models also which are a bit more expensive (shifted to the right) in each case.

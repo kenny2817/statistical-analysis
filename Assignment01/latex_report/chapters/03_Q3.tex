@@ -83,10 +83,6 @@ We selected \texttt{RangeKm} (along with its quadratic transformation) as the be
 
 First, we checked a model against all our top variables: \texttt{Capacity}, \texttt{RangeKm}, \texttt{FC}, and \texttt{Age}, table \ref{tab:q3_05}.
 
-\begin{verbatim}
-    regmodel.all <- lm(Price ~ ., data = numeric_air_data)
-\end{verbatim}
-
 \begin{table}[htbp]
     \centering
     \begin{tabular}{l r r r l}
@@ -114,19 +110,8 @@ First, we checked a model against all our top variables: \texttt{Capacity}, \tex
     \label{tab:q3_05}
 \end{table}
 
-
-\begin{verbatim}
-    regmodel.best4 <- lm(Price ~ Capacity + RangeKm + FC + Age, data = numeric_air_data)
-    
-    anova(regmodel.all, regmodel.best4)
-\end{verbatim}
-
 The ANOVA confirmed that the model with all predictors is not significantly better than the model with these 4 predictors. However, checking Variance Inflation Factors (VIF) revealed critical multicollinearity (tables \ref{tab:q3_06_vif} and \ref{tab:q3_06_cor}).
 
-\begin{verbatim}
-    cor(numeric_air_data[,-price.col])
-    vif(regmodel.best4)
-\end{verbatim}
 \begin{table}[htbp]
   \centering
   \caption{Correlation Matrix for Numeric Variables}

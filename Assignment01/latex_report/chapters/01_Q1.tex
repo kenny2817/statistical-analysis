@@ -7,24 +7,7 @@
 
 \subsection[Q1-a]{Import data set to R assigning the type of each variable correctly}
 
-We casted to factor both the string types ["Model", "SalesRegion"] and the very repetitive columns ["NumberofEngines", "EngineType"]. We considered casting also "ProductionYear", but in later calculation as the median was required, so we decided to leave as is (numerical). The code is shown below.
-
-\begin{verbatim}
-    air_data <- read.csv("./dataset.csv", sep=",", stringsAsFactors=TRUE)
-    
-    air_data <- air_data %>%
-      rename(
-        FC = FuelConsumption.L.h.,
-        HM = HourlyMaintenance...,
-        Price = Price...
-      )
-      
-    to_factors <- c("Model", "NumberofEngines", "EngineType", "SalesRegion")
-    
-    for (col in to_factors) {
-      air_data[[col]] <- as.factor(air_data[[col]])
-    }
-\end{verbatim}
+We casted to factor both the string types ["Model", "SalesRegion"] and the very repetitive columns ["NumberofEngines", "EngineType"]. We considered casting also "ProductionYear", but in later calculation as the median was required, so we decided to leave as is (numerical).
 
 \subsection[Q1-b]{Summarize the variables Price, Fuel Consumption first for the all data and then for the groups of Engine Type}
 
@@ -134,24 +117,13 @@ The two intervals do NOT overlap. This provides visual evidence that the mean Fu
 
 \subsection[Q1-e]{Check the association between Model and Sales Region in the whole sample using proper method and interpret your findings}
 
-To check the association between the 2 categories we used the chi square as the two types of variable needed it. The code is shown below.
-
-\begin{verbatim}
-    table_model_region <- table(air_data$Model, air_data$SalesRegion)
-    chisq_result <- chisq.test(table_model_region)
-\end{verbatim}
+To check the association between the 2 categories we used the chi square as the two types of variable needed it.
 
 The obtained p-value $>$ 0.05 ($\sim$0.73), so we fail to reject the null hypothesis and conclude that there is no statistically significant association between Model and Sales Region. The airplane models are distributed similarly across sales regions.
 
 \subsection[Q1-f]{Filter your data only considering $Bombardier CRJ200$ and $Cessna 172$ model airplanes}
 
 Here we applied a simple filter and removed the empty buckets. this way we obtained a clean dataset with only the 2 models.
-
-\begin{verbatim}
-    filtered_air_data <- air_data |>
-      filter(Model %in% c("$Bombardier CRJ200$", "$Cessna 172$")) |>
-      droplevels()
-\end{verbatim}
 
 \subsection[Q1-g]{Check the distribution of Price across two categories of Engine type (You can apply transformation if you think it is required)}
 
@@ -174,13 +146,6 @@ Here we applied a transformation to the price (log) since it appeared to be comp
 \subsection[Q1-h]{Categorize the variable Price into two categories as "low" and "High" by cutting from the median and save it as a new variable into your data frame}
 
 To compute the categorization of price we first calculated the median and then applied it to a new variable: $Price\_Category$.
-
-\begin{verbatim}
-    median_price <- median(filtered_air_data$Price, na.rm = TRUE)
-    filtered_air_data$Price_Category <- factor(
-      ifelse(filtered_air_data$Price > median_price, "High", "Low")
-    )
-\end{verbatim}
 
 \subsection[Q1-i]{Cross classify model and price categories and interpret the conditional probabilities}
 
@@ -219,10 +184,6 @@ Column proportions P(Model $\vert$ PriceCategory) table shows (table \ref{tab:q1
 \subsection[Q1-j]{Is there an association between the model of the airplane and its price level. Analyze it by using proper statistical method} 
 
 we applied the chi square test and obtained a p-value as a result.
-
-\begin{verbatim}
-    test_model_price <- chisq.test(cross_model_price)
-\end{verbatim}
 
 The p-value $<$ 0.05, so we reject the null hypothesis and conclude that there is a statistically significant association between airplane model and price level. Given that $Bombardier CRJ200$ (Turbofan) costs millions while $Cessna 172$ (Piston) costs hundreds of thousands, we expect a very small p-value, confirming a strong association.
 

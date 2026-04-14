@@ -127,8 +127,8 @@ The first dimension captures the scale and performance of the aircraft, and seem
 \end{figure}
 
 \begin{itemize}
-    \item \textbf{KMO Test} (Figure \ref{tab:q4_06}): The overall KMO value is 0.533, which is below 0.6. Notably, Age shows the highest individual adequacy at 0.824.
-    \item \textbf{Bartlett's Test} (Figure \ref{tab:q4_07}): Our result shows a p-value of 0 ($p < 0.05$), confirming that the variables are sufficiently related to justify PCA.
+    \item \textbf{KMO Test} (Table \ref{tab:q4_06}): The overall KMO value is 0.533, which is below 0.6. Notably, Age shows the highest individual adequacy at 0.824.
+    \item \textbf{Bartlett's Test} (Table \ref{tab:q4_07}): Our result shows a p-value of 0 ($p < 0.05$), confirming that the variables are sufficiently related to justify PCA.
     \item \textbf{Linearity} (Figure \ref{fig:q4_08}): PCA assumes linear relationships between variables. The scatterplot matrix confirms a strong linear trend between Capacity and RangeKm, though relationships with other variables are less defined.
 \end{itemize}
 
@@ -154,7 +154,7 @@ The first dimension captures the scale and performance of the aircraft, and seem
     \label{tab:q4_09}
 \end{table}
 
-We evaluated several Principal Component Regression (PCR) specifications, concluding that the quadratic model (Figure \ref{tab:q4_09}) offers the most balanced performance.
+We evaluated several Principal Component Regression (PCR) specifications, concluding that the quadratic model (Table \ref{tab:q4_09}) offers the most balanced performance.
 
 Initially, we fitted a simple linear regression using only the first principal component (PC1), which captures the primary variance in Price (as shown in the Correlation Circle, Figure \ref{fig:q4_05}). While initial results were promising, the Residuals vs. Fitted plot revealed a distinct parabolic trend, signaling a violation of the linearity assumption. To address this, we introduced a quadratic term ($PC1^2$), which resulted in a substantial improvement in model fit (Figure \ref{fig:q4_10}). Both ANOVA (Partial F-test) and AIC comparisons statistically confirmed that the inclusion of the squared term was necessary to capture the non-linear relationship.
 
