@@ -7,57 +7,28 @@
 
 \subsection[Q4-a]{Apply PCA analysis on airplane data and interpret the results of the analysis.}
 
-We applied a log transformation to the Price variable, consistent with the methodology in Q3, even though it was not utilized directly as an input for the PCA.
+% We applied a log transformation to the Price variable, consistent with the methodology in Q3, even though it was not utilized directly as an input for the PCA.
 
-To ensure a robust analysis, we performed the PCA using two functions: \texttt{princomp()} and \texttt{PCA()}. Both methods yielded identical results, identifying five principal components based on the calculated eigenvalues (table \ref{tab:q4_01}).
+% To ensure a robust analysis, we performed the PCA using two functions: \texttt{princomp()} and \texttt{PCA()}. Both methods yielded identical results, identifying five principal components based on the calculated eigenvalues (table \ref{tab:q4_01}).
 
-\begin{table}[htbp]
-    \centering
-    \begin{tabular}{l r r r r r}
-        \hline
-         & \textbf{Dim.1} & \textbf{Dim.2} & \textbf{Dim.3} & \textbf{Dim.4} & \textbf{Dim.5} \\ 
-        \hline
-        Variance              & 2.298  & 1.011  & 0.989  & 0.693  & 0.009   \\
-        \% of var.            & 45.952 & 20.226 & 19.779 & 13.858 & 0.185   \\
-        Cumulative \% of var. & 45.952 & 66.177 & 85.957 & 99.815 & 100.000 \\
-        \hline
-    \end{tabular}
-    \caption{Eigenvalues}
-    \label{tab:q4_01}
-\end{table}
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=\figsizetext]{Q4/eigen-values-plot.png}
+%     \caption{Scree plot of eigenvalues}
+%     \label{fig:q4_02}
+% \end{figure}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\figsizetext]{Q4/eigen-values-plot.png}
-    \caption{Scree plot of eigenvalues}
-    \label{fig:q4_02}
-\end{figure}
+% \subsubsection*{Discussion of Variance and Selection Criteria}
 
-\subsubsection*{Discussion of Variance and Selection Criteria}
+% As shown in table \ref{tab:q4_01}, Principal Component 1 (PC1) accounts for 45.95\% of the total variance, while PC2 and PC3 explain approximately 20\% each. To determine the optimal number of components to retain, we evaluated three standard criteria:
 
-As shown in table \ref{tab:q4_01}, Principal Component 1 (PC1) accounts for 45.95\% of the total variance, while PC2 and PC3 explain approximately 20\% each. To determine the optimal number of components to retain, we evaluated three standard criteria:
+% \begin{itemize}
+%     \item \textbf{80\% Variance Rule}: To capture at least 80\% of the information, we must retain the first three components, which collectively explain 85.96\% of the total variation.
+%     \item \textbf{Kaiser's Rule}: While PC1 and PC2 strictly meet this requirement, PC3 is a borderline case with an eigenvalue of 0.989 (see table \ref{tab:q4_01}). Given how close this value is to 1, retaining PC3 is statistically justifiable to meet our variance threshold.
+%     \item \textbf{Elbow Rule}: If we were to strictly follow the ``elbow'' or bend in the scree plot (see Figure \ref{fig:q4_02}), the most significant drop occurs after PC1.
+% \end{itemize}
 
-\begin{itemize}
-    \item \textbf{80\% Variance Rule}: To capture at least 80\% of the information, we must retain the first three components, which collectively explain 85.96\% of the total variation.
-    \item \textbf{Kaiser's Rule}: While PC1 and PC2 strictly meet this requirement, PC3 is a borderline case with an eigenvalue of 0.989 (see table \ref{tab:q4_01}). Given how close this value is to 1, retaining PC3 is statistically justifiable to meet our variance threshold.
-    \item \textbf{Elbow Rule}: If we were to strictly follow the ``elbow'' or bend in the scree plot (see Figure \ref{fig:q4_02}), the most significant drop occurs after PC1.
-\end{itemize}
-
-Balancing these methods, we would retain the first three components to ensure a comprehensive representation of the dataset's variance.
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=\figsizetext]{Q4/biplot-dots.png}
-    \caption{PCA Biplot with individual observations}
-    \label{fig:q4_03}
-\end{figure}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=\figsizetext]{Q4/biplot.png}
-    \caption{PCA Variables Factor Map}
-    \label{fig:q4_04}
-\end{figure}
+% Balancing these methods, we would retain the first three components to ensure a comprehensive representation of the dataset's variance.
 
 \begin{figure}[htbp]
     \centering
@@ -85,47 +56,6 @@ The first dimension captures the scale and performance of the aircraft, and seem
 
 \subsubsection*{Assumptions}
 
-\begin{table}[htbp]
-  \centering
-  \begin{tabular}{lr}
-    \toprule
-    \textbf{Variable} & \textbf{MSA} \\
-    \midrule
-    Capacity & 0.518 \\
-    RangeKm  & 0.520 \\
-    FC       & 0.633 \\
-    HM       & 0.563 \\
-    Age      & 0.825 \\
-    \midrule
-    \textbf{Overall KMO} & \textbf{0.533} \\
-    \bottomrule
-  \end{tabular}
-  \caption{Kaiser-Meyer-Olkin (KMO) Factor Adequacy}
-  \label{tab:q4_06}
-\end{table}
-
-\begin{table}[htbp]
-  \centering
-  \begin{tabular}{lr}
-    \toprule
-    \textbf{Statistic} & \textbf{Value} \\
-    \midrule
-    Chi-Squared ($\chi^2$)  & 52174.84 \\
-    Degrees of Freedom (df) & 10 \\
-    p-value                 & 0 \\
-    \bottomrule
-  \end{tabular}
-  \caption{Bartlett's Test of Sphericity}
-  \label{tab:q4_07}
-\end{table}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\figsizetext]{Q4/linearity.png}
-    \caption{Linearity check via scatterplot matrix}
-    \label{fig:q4_08}
-\end{figure}
-
 \begin{itemize}
     \item \textbf{KMO Test} (Table \ref{tab:q4_06}): The overall KMO value is 0.533, which is below 0.6. Notably, Age shows the highest individual adequacy at 0.824.
     \item \textbf{Bartlett's Test} (Table \ref{tab:q4_07}): Our result shows a p-value of 0 ($p < 0.05$), confirming that the variables are sufficiently related to justify PCA.
@@ -133,26 +63,6 @@ The first dimension captures the scale and performance of the aircraft, and seem
 \end{itemize}
 
 \subsection[Q4-b]{Find the best linear model to predict price on the principal components. Do not forget to test the assumptions and the validity of the model.}
-
-\begin{table}[htbp]
-    \centering
-    \begin{tabular}{l r r r l}
-        \hline
-        \textbf{Coefficients} & \textbf{Estimate} & \textbf{Std. Error} & \textbf{t value} & \textbf{Pr($>$$|$t$|$)} \\ 
-        \hline
-        (Intercept) & 18.238469 & 0.009318 & 1957.36 & $< 2\text{e-}16$ *** \\
-        Comp.1      &  1.492014 & 0.004472 &  333.60 & $< 2\text{e-}16$ *** \\
-        Comp.1\_2   & -0.273755 & 0.002826 &  -96.87 & $< 2\text{e-}16$ *** \\
-        \hline
-        \multicolumn{5}{l}{\textbf{Model Statistics}} \\
-        \multicolumn{5}{l}{Residual standard error: 0.7435 on 12374 degrees of freedom} \\
-        \multicolumn{5}{l}{Multiple $R^2$: 0.9162, \quad Adjusted $R^2$: 0.9162} \\
-        \multicolumn{5}{l}{F-statistic: $6.767\text{e+}04$ on 2 and 12374 DF, \quad p-value: $< 2.2\text{e-}16$} \\
-        \hline
-    \end{tabular}
-    \caption{PCR Model Summary (Quadratic)}
-    \label{tab:q4_09}
-\end{table}
 
 We evaluated several Principal Component Regression (PCR) specifications, concluding that the quadratic model (Table \ref{tab:q4_09}) offers the most balanced performance.
 
@@ -166,9 +76,6 @@ Regarding the remaining components, we opted to exclude PC2 and PC3. PC2 is orth
     \caption{PCR Residuals Analysis}
     \label{fig:q4_10}
 \end{figure}
-
-We don't need to test collinearity with \texttt{vif()} because components are orthogonal between them (no correlation) and there is no linear association between a variable and its squared term.
-
 
 \subsubsection*{Assumptions}
 
